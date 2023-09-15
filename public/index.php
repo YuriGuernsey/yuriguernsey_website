@@ -1,20 +1,3 @@
-<?php
-if(isset($_POST)){
-    
-$to = "recipient@example.com";
-$subject = "My Subject";
-$message = "Hello, this is a test email!";
-$headers = "From: your_email@example.com\r\n";
-$headers .= "Reply-To: your_email@example.com\r\n";
-$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-
-if (mail($to, $subject, $message, $headers)) {
-    echo "Email sent successfully.";
-} else {
-    echo "Email sending failed.";
-}
-}
-?>
 
 
 <!DOCTYPE html>
