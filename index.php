@@ -1,3 +1,22 @@
+<?php
+if(isset($_POST)){
+    
+$to = "recipient@example.com";
+$subject = "My Subject";
+$message = "Hello, this is a test email!";
+$headers = "From: your_email@example.com\r\n";
+$headers .= "Reply-To: your_email@example.com\r\n";
+$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+
+if (mail($to, $subject, $message, $headers)) {
+    echo "Email sent successfully.";
+} else {
+    echo "Email sending failed.";
+}
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -793,24 +812,24 @@ nav#bottomNav.show {
             </section>
             <section id="contact" class="contact">
                 <h3>Contact me</h3>
-                <form>
+                <form action="/" method="POST">
                     <div>
-                        <label>Name:</label>
-                        <input placeholder="John Doe" type="text" />
+                        <label for="name">Name:</label>
+                        <input placeholder="John Doe" type="text" name="name"/>
                     </div>
                     <div>
-                        <label>Email:</label>
-                        <input placeholder="JohnDoe@example.com" type="email" />
+                        <label for="email">Email:</label>
+                        <input placeholder="JohnDoe@example.com" type="email" name="email"/>
                     </div>
                     <div>
-                        <label>Subject:</label>
-                        <input placeholder="I would like to hire you" type="text" />
+                        <label for="subject">Subject:</label>
+                        <input placeholder="I would like to hire you" type="text" name="subject"/>
                     </div>
                     <div>
-                        <label>Message:</label>
+                        <label for="message">Message:</label>
                         <textarea></textarea>
                     </div>
-                    <input class="prim btn" type="submit" placeholder="Send" />
+                    <input class="prim btn" type="submit" placeholder="Send" name="message"/>
                 </form>
             </section>
         </main>
