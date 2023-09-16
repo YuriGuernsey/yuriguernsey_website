@@ -1,10 +1,3 @@
-<?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +5,8 @@ error_reporting(E_ALL);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
-
+    <script type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <title>YuriGuernsey</title>
     <style>
         * {
@@ -474,10 +468,14 @@ nav#bottomNav.show {
     font-size: 12px;
 }
         }
+
+       
     </style>
 </head>
 
 <body>
+
+      
     <!-- Splash Screen -->
     <div class="splash-screen">
         <p class="splash-text">Your Jack of <s>Trades</s></p>
@@ -800,7 +798,7 @@ nav#bottomNav.show {
             </section>
             <section id="contact" class="contact">
                 <h3>Contact me</h3>
-                <form action="/" method="POST">
+                <form id="contact-form" action="/" method="POST">
                     <div>
                         <label for="name">Name:</label>
                         <input placeholder="John Doe" type="text" name="name"/>
@@ -895,6 +893,28 @@ observer.observe(homeSection);
 observer.observe(workSection);
 observer.observe(aboutSection);
 observer.observe(contactSection);
+
+    </script>
+    <script type="text/javascript">
+        (function(){
+           emailjs.init("oWr1TJSRgQTP2Our1");
+        })();
+     </script>
+     <script type="text/javascript">
+        window.onload = function() {
+            document.getElementById('contact-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+               
+                
+                // these IDs from the previous steps
+                emailjs.sendForm('service_ka0upbg', 'template_4tjpcc9', this)
+                    .then(function() {
+                        console.log('SUCCESS!');
+                    }, function(error) {
+                        console.log('FAILED...', error);
+                    });
+            });
+        }
     </script>
 </body>
 
