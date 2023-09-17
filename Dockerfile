@@ -1,12 +1,39 @@
-#Dockerfile
-FROM oven/bun
+# syntax = docker/dockerfile:1
 
-WORKDIR /usr/src/app
+# Adjust BUN_VERSION as desired
+ARG BUN_VERSION=1.0.2
+FROM oven/bun:${BUN_VERSION} as base
 
-COPY package*.json bun.lockb ./
-RUN bun install
-COPY . .
+LABEL fly_launch_runtime="Bun"
 
-ENV NODE_ENV production
+# Bun app lives here
+WORKDIR /app
 
-CMD [ "bun", "start" ]
+# Set production environment
+ENV NODE_ENV=production
+
+
+# Throw-away build stage to reduce size of final image
+FROM base as build
+
+# Install packages needed to build node modules
+RUN apt-get update -qq && \
+  apt-get install -y python-is-python3 pkg-config build-essential 
+
+# Install node modules
+COPY --link bun.lockb package.json ./
+RUN bun install --ci
+
+# Copy application code
+COPY --link . .
+
+
+# Final stage for app image
+FROM base
+
+# Copy built application
+COPY --from=build /app /app
+
+# Start the server by default, this can be overwritten at runtime
+EXPOSE 3000
+CMD [ "bun", "src/index.tsx" ]
