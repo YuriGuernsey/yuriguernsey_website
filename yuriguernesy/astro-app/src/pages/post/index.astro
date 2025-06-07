@@ -1,0 +1,35 @@
+---
+import type { InferGetStaticParamsType } from "astro";
+import { PortableText } from "astro-portabletext";
+import Layout from "../../layouts/Layout.astro";
+import { formatDate } from "../../utils";
+import { urlFor } from "../../utils/image";
+import { getBlogPost, getBlogPosts } from "../../utils/sanity";
+
+
+  const posts = await getBlogPosts();
+  
+
+
+const post = await getBlogPosts();
+---
+
+<Layout title={'Posts'}>
+     <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <a href="/" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white mb-6">
+  ← Back to Home
+</a>
+    <h1 class="text-4xl font-bold dark:text-white mb-4">Build Logs, Experiments & Rants</h1>
+  <p class="text-lg text-gray-600 dark:text-gray-300 mb-2">No fluff. Just the process, the problems, and the random sparks.
+Sometimes useful. Sometimes unhinged.</p>
+<ul class="list-disc ml-5 space-y-1">
+   {posts.map((post) => (
+    <li>
+      <a href={`/post/${post.slug.current}`} class="text-yellow-400 underline text-sm mb-6">
+        {post.title}
+      </a>
+    </li>
+  ))}
+    </ul>
+  </article>
+</Layout>

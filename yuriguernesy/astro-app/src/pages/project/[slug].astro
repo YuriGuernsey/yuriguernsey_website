@@ -1,0 +1,47 @@
+---
+import type { InferGetStaticParamsType } from "astro";
+import { PortableText } from "astro-portabletext";
+import Layout from "../../layouts/Layout.astro";
+import { formatDate } from "../../utils";
+import { urlFor } from "../../utils/image";
+import { getProject, getProjects } from "../../utils/sanity";
+
+export async function getStaticPaths() {
+  const posts = await getProjects();
+  return posts.map((post) => ({
+    params: { slug: post.slug.current },
+  }));
+}
+
+type Params = InferGetStaticParamsType<typeof getStaticPaths>;
+const { slug } = Astro.params as Params;
+
+const post = await getProject(slug);
+---
+<Layout title={post.title!}>
+
+  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <a href="/" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white mb-6">
+  ← Back to Home
+</a>
+    {post.mainImage && (
+      <img
+        src={urlFor(post.mainImage).url()}
+        alt={post.title}
+        class="w-full h-64 object-cover rounded-md mb-8"
+      />
+    )}
+    <h1 class="text-4xl font-bold dark:text-white mb-4">
+      {post.title}
+    </h1>
+    <p class="text-lg text-gray-600 dark:text-gray-300 mb-2">
+      {post.excerpt}
+    </p>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+      {formatDate(post._createdAt)}
+    </p>
+    <div class="prose prose-lg dark:prose-invert">
+      <PortableText value={post.body} />
+    </div>
+  </article>
+</Layout>

@@ -1,0 +1,438 @@
+---
+import { PortableText } from "astro-portabletext";
+import Card from "../components/Card.astro";
+import Welcome from "../components/Welcome.astro";
+import Layout from "../layouts/Layout.astro";
+import { urlFor, urlforFile } from "../utils/image";
+import { getBlogPosts, getHomepage, getProjects, getExperience } from "../utils/sanity";
+
+const posts = await getBlogPosts();
+const projects = await getProjects();
+const home = await getHomepage();
+const jobs = await getExperience();
+const cvURL = await urlforFile();
+
+function returnDateToString(rawDate:any){
+  return new Date(rawDate).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+}
+
+function returnShortDateToString(rawDate:any){
+  return new Date(rawDate).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+});
+}
+---
+
+<Layout title={home.seoTitle}>
+<section id="top" class="hero">
+  <div class="hero-bg">
+<svg width="720" height="776" viewBox="0 0 720 776" fill="none" xmlns="http://www.w3.org/2000/svg">
+<line x1="-0.711587" y1="784.68" x2="719.288" y2="396.68" stroke="url(#paint0_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="746.68" x2="719.288" y2="358.68" stroke="url(#paint1_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="858.68" x2="719.288" y2="470.68" stroke="url(#paint2_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="820.68" x2="719.288" y2="432.68" stroke="url(#paint3_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="932.68" x2="719.288" y2="544.68" stroke="url(#paint4_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="894.68" x2="719.288" y2="506.68" stroke="url(#paint5_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="561.68" x2="719.288" y2="173.68" stroke="url(#paint6_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="523.68" x2="719.288" y2="135.68" stroke="url(#paint7_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="635.68" x2="719.288" y2="247.68" stroke="url(#paint8_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="597.68" x2="719.288" y2="209.68" stroke="url(#paint9_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="709.68" x2="719.288" y2="321.68" stroke="url(#paint10_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="671.68" x2="719.288" y2="283.68" stroke="url(#paint11_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="1008.68" x2="719.288" y2="620.68" stroke="url(#paint12_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="970.68" x2="719.288" y2="582.68" stroke="url(#paint13_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="1082.68" x2="719.288" y2="694.68" stroke="url(#paint14_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="1044.68" x2="719.288" y2="656.68" stroke="url(#paint15_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="1156.68" x2="719.288" y2="768.68" stroke="url(#paint16_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="1118.68" x2="719.288" y2="730.68" stroke="url(#paint17_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="337.68" x2="719.288" y2="-50.3205" stroke="url(#paint18_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="299.68" x2="719.288" y2="-88.3205" stroke="url(#paint19_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="411.68" x2="719.288" y2="23.6795" stroke="url(#paint20_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="373.68" x2="719.288" y2="-14.3205" stroke="url(#paint21_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="485.68" x2="719.288" y2="97.6795" stroke="url(#paint22_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="447.68" x2="719.288" y2="59.6795" stroke="url(#paint23_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="124.68" x2="719.288" y2="-263.32" stroke="url(#paint24_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="86.6795" x2="719.288" y2="-301.32" stroke="url(#paint25_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="48.6795" x2="719.288" y2="-339.32" stroke="url(#paint26_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="10.6795" x2="719.288" y2="-377.32" stroke="url(#paint27_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="198.68" x2="719.288" y2="-189.32" stroke="url(#paint28_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="160.68" x2="719.288" y2="-227.32" stroke="url(#paint29_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="272.68" x2="719.288" y2="-115.32" stroke="url(#paint30_linear_201_304)" stroke-width="3"/>
+<line x1="-0.711587" y1="234.68" x2="719.288" y2="-153.32" stroke="url(#paint31_linear_201_304)" stroke-width="3"/>
+<defs>
+<linearGradient id="paint0_linear_201_304" x1="0.237196" y1="786.44" x2="720.237" y2="398.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint1_linear_201_304" x1="0.237196" y1="748.44" x2="720.237" y2="360.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint2_linear_201_304" x1="0.237196" y1="860.44" x2="720.237" y2="472.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint3_linear_201_304" x1="0.237196" y1="822.44" x2="720.237" y2="434.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint4_linear_201_304" x1="0.237196" y1="934.44" x2="720.237" y2="546.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint5_linear_201_304" x1="0.237196" y1="896.44" x2="720.237" y2="508.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint6_linear_201_304" x1="0.237196" y1="563.44" x2="720.237" y2="175.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint7_linear_201_304" x1="0.237196" y1="525.44" x2="720.237" y2="137.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint8_linear_201_304" x1="0.237196" y1="637.44" x2="720.237" y2="249.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint9_linear_201_304" x1="0.237196" y1="599.44" x2="720.237" y2="211.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint10_linear_201_304" x1="0.237196" y1="711.44" x2="720.237" y2="323.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint11_linear_201_304" x1="0.237196" y1="673.44" x2="720.237" y2="285.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint12_linear_201_304" x1="0.237196" y1="1010.44" x2="720.237" y2="622.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint13_linear_201_304" x1="0.237196" y1="972.44" x2="720.237" y2="584.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint14_linear_201_304" x1="0.237196" y1="1084.44" x2="720.237" y2="696.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint15_linear_201_304" x1="0.237196" y1="1046.44" x2="720.237" y2="658.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint16_linear_201_304" x1="0.237196" y1="1158.44" x2="720.237" y2="770.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint17_linear_201_304" x1="0.237196" y1="1120.44" x2="720.237" y2="732.44" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint18_linear_201_304" x1="0.237196" y1="339.44" x2="720.237" y2="-48.5599" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint19_linear_201_304" x1="0.237196" y1="301.44" x2="720.237" y2="-86.5599" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint20_linear_201_304" x1="0.237196" y1="413.44" x2="720.237" y2="25.4401" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint21_linear_201_304" x1="0.237196" y1="375.44" x2="720.237" y2="-12.5599" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint22_linear_201_304" x1="0.237196" y1="487.44" x2="720.237" y2="99.4401" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint23_linear_201_304" x1="0.237196" y1="449.44" x2="720.237" y2="61.4401" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint24_linear_201_304" x1="0.237196" y1="126.44" x2="720.237" y2="-261.56" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint25_linear_201_304" x1="0.237196" y1="88.4402" x2="720.237" y2="-299.56" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint26_linear_201_304" x1="0.237196" y1="50.4402" x2="720.237" y2="-337.56" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint27_linear_201_304" x1="0.237196" y1="12.4402" x2="720.237" y2="-375.56" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint28_linear_201_304" x1="0.237196" y1="200.44" x2="720.237" y2="-187.56" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint29_linear_201_304" x1="0.237196" y1="162.44" x2="720.237" y2="-225.56" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint30_linear_201_304" x1="0.237196" y1="274.44" x2="720.237" y2="-113.56" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+<linearGradient id="paint31_linear_201_304" x1="0.237196" y1="236.44" x2="720.237" y2="-151.56" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAC400"/>
+<stop offset="1" stop-color="#151B22"/>
+</linearGradient>
+</defs>
+</svg>
+
+
+</div>
+{home.lookingForWork && (
+<div class="pillWork">
+<p>Open For Hire</p>
+Want to hire me?
+</div>
+)}
+<h1 class="heroTitle">{home.heroTitle}</h1>
+<h3 class="heroSubTitle">{home.heroSubtitle}</h3>
+  <p class="heroParagraph">
+    {home.herosubheading}
+  </p>
+  <div class="heroButtons">
+    <a href="#" class="primButton">Contact me</a>
+     <a href={cvURL+'?dl'} class="secButton">Download Resume</a>
+  </div>
+      </section>
+
+<section class="p-4">
+   <h3 class="text-5xl font-bold mb-2 uppercase">Featured Work</h3>
+    <p class="mb-2 lowercase">A few projects I’ve built recently — solo, with a team, or just for fun.</p>
+     <ul class="space-y-4">
+        {projects.slice(0, 3).map((project) => (
+          <li key={project.slug.current} >
+            <a class="flex justify-between mt-2" href={`/project/${project.slug.current}`} class="text-yellow-400 underline">
+              <div class="work">
+                <h3 class="yellow text-xl bold">{project.title}</h4>
+              <p class="text-sm bold">{project.excerpt}</p>
+                </div>
+                <div class="text-right uppercase">
+                <h4 class="text-xl bold">{project.tags}</h4>
+              <p class="text-sm bold">{project.description}</p>
+                </div>
+            </a>
+          </li>
+        ))}
+        <a href="/project" class="secButton uppercase mt-8 block w-fit !py-2">View All Projects </a>
+      </ul>
+</section>
+
+<section class="p-4">
+   <h3 class="text-5xl font-bold mb-2 uppercase">Build Logs, Experiments & Rants</h3>
+    <p class="mb-2 lowercase">No fluff. Just the process, the problems, and the random sparks. Sometimes useful. Sometimes unhinged.</p>
+     <ul class="space-y-4">
+        {posts.slice(0, 3).map((post) => (
+          <li key={post.slug.current} >
+            <a class="flex justify-between mt-2" href={`/post/${post.slug.current}`} class="text-yellow-400 underline">
+              <div class="work">
+                <h3 class="yellow text-xl bold">{post.title}</h4>
+              <p class="text-sm bold">{post.excerpt}</p>
+                </div>
+                <div class="text-right uppercase">
+                <h4 class="text-xl bold">{post.tags}</h4>
+              <p class="text-sm bold">{returnDateToString(post._createdAt)}</p>
+                </div>
+            </a>
+          </li>
+        ))}
+        <a href="/post" class="secButton uppercase mt-8 block w-fit !py-2">View All Posts </a>
+      </ul>
+</section>
+<section class="p-4">
+   <h3 class="text-5xl font-bold mb-2 uppercase">More about me</h3>
+   <PortableText value={home.moreAboutMe} />
+      <h4 class="text-2xl font-bold mb-2 uppercase yellow">Highlights</h4>
+       <PortableText value={home.moreAboutMeHighlights} />
+      <h4 class="text-2xl font-bold mb-2 uppercase yellow mt-2">Life Mission</h4>
+    <PortableText value={home.moreAboutMeLifeMission} />
+
+     <h4 class="text-2xl font-bold mb-2 uppercase yellow mt-2">Employment <span class="text-xs text-white">(Click on job to read more)</span></h4>
+    <ul class="">
+        {jobs.map((job) => (
+          <div class="job">
+          <li key={job._id}  class="flex justify-between mt-2">
+              <div>
+                <h3 class=" text-xl bold">{job.title}</h4>
+              <p class="text-sm bold">{job.company}</p>
+                </div>
+                <div class="text-right uppercase">
+                <h4 class="text-xl bold">
+                  {returnShortDateToString(job.startDate)} - {job.currentlyEmployed ? 'Present' : returnShortDateToString(job.endDate)}
+                  </h4>
+              <p class="text-sm bold">{job.employmentType}</p>
+                </div>
+          </li>
+            <div class="expandable">
+               <PortableText value={job.body} />
+              
+                </div>
+          </div>
+        ))}
+        
+      </ul>
+</section>
+
+
+<section class="p-4">
+ <h3 class="text-5xl font-bold mb-2 uppercase">Let's talk</h3>
+<p class="mb-2 lowercase">Got an idea? A project? A weird challenge? I’m all ears (and fast fingers).</p>
+  <div class="flex justify-center space-x-4 mt-6">
+    <a href="https://github.com/YuriGuernsey" target="_blank" class="yellow hover:underline">github</a>
+    <a href="mailto:aeveagg@pm.me" class="yellow hover:underline">email me</a>
+    <a href={cvURL+'?dl'} class="yellow hover:underline">resume</a>
+    <a href="https://www.linkedin.com/in/yuriguernsey" class="yellow hover:underline">linkedIn</a>
+  </div>
+  <p class="text-sm text-gray-400 mt-6 text-center">PS: Built this site myself with Astro + Sanity.io + vibes. <a href="#" class="yellow hover:underline">read about it here</a></p>
+</section> 
+<style>
+.hero {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-top: 100px;
+    margin-bottom: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    line-height: 40px;
+    max-height:550px;
+
+}
+
+.heroTitle{
+  font-size: 110px;
+}
+.heroSubTitle{
+  font-size: 40px;
+  max-width: 600px;
+  margin-top: 40px;
+}
+
+.heroParagraph{
+  font-size: 18px;
+  max-width: 700px;
+  margin-top: 20px;
+  text-transform: lowercase;
+  line-height: 20px;
+}
+
+.heroButtons{
+  margin-top: 20px;
+      display: flex;
+    gap: 20px;
+}
+
+.primButton{
+  background: #DAC400;
+  padding: 0px 15px;
+  border-radius: 5px;
+  color: #151B22;
+  font-weight: bolder;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.secButton{
+  border: solid 2px #DAC400;
+  padding: 0px 15px;
+  border-radius: 5px;
+  color: #DAC400;
+  font-weight: bolder;
+    vertical-align: middle;
+      box-sizing: border-box;
+}
+
+.yellow{
+    color: #DAC400;
+}
+
+.hero-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%; /* or 100% if full background */
+  height: 550px;
+  z-index: -1;
+  overflow: hidden;
+}
+.job{
+  cursor: pointer;
+}
+.expandable {
+  max-height: 0rem;         /* collapsed height */
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  cursor: pointer;
+  padding: 0;
+}
+ .expandable.expanded {
+  max-height: 500px;        /* large enough to show full text */
+  padding: 1rem 0;
+}
+
+.pillWork{
+      background: rgba(218,196,9,0.5);
+    display: flex;
+    margin-bottom: 50px;
+    justify-content: space-around;
+    border-radius: 30px;
+    padding: 0 20px 0 0;
+    gap: 10px;
+}
+
+.pillWork > p{
+  background: #DAC400;
+    padding: 0 20px 0 20px;
+     border-radius: 30px;
+     color: #151B22;
+     font-weight: bold;
+}
+
+</style>
+<script is:inline>
+  const el = document.querySelector('.heroSubTitle'); // your element
+const text = el.textContent.trim();
+
+// Split into words
+const words = text.split(' ');
+
+// Handle short text edge case
+if (words.length >= 1) {
+  const lastTwo = words.splice(-2).join(' ');
+  const rest = words.join(' ');
+
+  // Reconstruct with span wrapping the last 2 words
+  el.innerHTML = `${rest} <span style="color:#DAC400;">${lastTwo}</span>`;
+}
+
+
+document.querySelectorAll('.job').forEach(p => {
+  p.addEventListener('click', () => {
+    const target = p.querySelector('.expandable');
+    target.classList.toggle('expanded');
+  });
+});
+
+</script>
+</Layout>

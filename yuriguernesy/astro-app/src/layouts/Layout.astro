@@ -1,0 +1,100 @@
+---
+// https://docs.astro.build/en/guides/view-transitions/
+import { ViewTransitions } from 'astro:transitions';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/favicon.svg"
+    />
+    <meta
+      name="generator"
+      content={Astro.generator}
+    />
+
+    <!-- Google fonts -->
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+
+    <title>YuriGuernsey | {title}</title>
+     <meta name="title" content="YuriGuernsey | Software Development Portfolio"/>
+        <meta name="description" content="Hello, I'm YuriGuernsey, a versatile and dedicated software developer. With a passion for technology and a knack for mastering various facets of software development, I proudly consider myself a 'Jack of all trades' in this dynamic field. Explore my portfolio to witness a diverse range of projects and skills that showcase my adaptability and expertise in creating innovative solutions"/>
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website"/>
+        <meta property="og:url" content="https://yuriguernsey.com/"/>
+        <meta property="og:title" content="YuriGuernsey | Software Development Portfolio"/>
+        <meta property="og:description" content="Hello, I'm YuriGuernsey, a versatile and dedicated software developer. With a passion for technology and a knack for mastering various facets of software development, I proudly consider myself a 'Jack of all trades' in this dynamic field. Explore my portfolio to witness a diverse range of projects and skills that showcase my adaptability and expertise in creating innovative solutions"/>
+        <meta property="og:image" content="/public/assets/meta_image.png"/>
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image"/>
+        <meta property="twitter:url" content="https://yuriguernsey.com/"/>
+        <meta property="twitter:title" content="YuriGuernsey | Software Development Portfolio"/>
+        <meta property="twitter:description" content="Hello, I'm YuriGuernsey, a versatile and dedicated software developer. With a passion for technology and a knack for mastering various facets of software development, I proudly consider myself a 'Jack of all trades' in this dynamic field. Explore my portfolio to witness a diverse range of projects and skills that showcase my adaptability and expertise in creating innovative solutions"/>
+        <meta property="twitter:image" content="/public/assets/meta_image.png"/>
+        <!-- Meta Tags Generated with https://metatags.io -->
+        <script src="https://cdn.tailwindcss.com" is:inline async></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <ViewTransitions />
+<style>
+*{
+  margin: 0;
+  padding: 0;  
+}
+html{
+  font-family: Poppins;
+  color: #f0f0f0;
+  scroll-behavior: smooth;
+	overflow: scroll
+}
+body{
+  min-height: 100vh;
+  margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    background-color: #151B22;
+    color: white;
+}
+
+
+.yellow{
+    color: #DAC400;
+}
+
+
+</style>
+  </head>
+  <body class="flex justify-center">
+    <div class="container">
+     
+      <main>
+        <slot />
+      </main>
+      
+    </div>
+  </body>
+</html>
