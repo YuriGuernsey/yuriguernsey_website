@@ -25,6 +25,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@astrojs/netlify": "^6.3.4",
     "sanity-plugin-iconify": "^2.0.2",
     "sanity-plugin-media": "^3.0.2"
   }
