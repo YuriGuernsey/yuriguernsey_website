@@ -308,7 +308,7 @@ Want to hire me?
     <a href={cvURL+'?dl'} class="yellow hover:underline">resume</a>
     <a href="https://www.linkedin.com/in/yuriguernsey" class="yellow hover:underline">linkedIn</a>
   </div>
-  <p class="text-sm text-gray-400 mt-6 text-center">PS: Built this site myself with Astro + Sanity.io + vibes. <a href="#" class="yellow hover:underline">read about it here</a></p>
+  <p class="text-sm text-gray-400 mt-6 text-center">PS: Built this site myself with Astro + Sanity.io + vibes. <a href="http://yuriguernsey.com/project/yuriguernsey-com-v2" class="yellow hover:underline">read about it here</a></p>
 </section> 
 <style>
 .hero {
@@ -413,6 +413,11 @@ Want to hire me?
      border-radius: 30px;
      color: #151B22;
      font-weight: bold;
+}
+body > div >main > section:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)):not(:nth-child(5)) ul {
+    list-style: circle;
+    padding-left: 20px;
+    margin-bottom: 20px;
 }
 
 </style>
