@@ -41,7 +41,7 @@ const post = await getBlogPost(slug);
     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
       {formatDate(post._createdAt)}
     </p>
-    <div class="prose prose-lg dark:prose-invert">
+    <div class="prose prose-lg dark:prose-invert p-4 [&>ul]:list-disc [&>ul]:list-inside [&>ul]:pl-5 [&>ul]:mb-[20px] [&>p]:mb-[20px]">
       <PortableText value={post.body} />
     </div>
   </article>
