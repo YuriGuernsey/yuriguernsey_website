@@ -263,7 +263,7 @@ Want to hire me?
         <a href="/post" class="secButton uppercase mt-8 block w-fit !py-2">View All Posts </a>
       </ul>
 </section>
-<section class="p-4">
+<section class="p-4 [&>ul]:list-disc [&>ul]:list-inside [&>ul]:pl-5 [&>ul]:mb-[20px]">
    <h3 class="text-5xl font-bold mb-2 uppercase">More about me</h3>
    <PortableText value={home.moreAboutMe} />
       <h4 class="text-2xl font-bold mb-2 uppercase yellow">Highlights</h4>
@@ -413,11 +413,6 @@ Want to hire me?
      border-radius: 30px;
      color: #151B22;
      font-weight: bold;
-}
-body > div >main > section:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)):not(:nth-child(5)) ul {
-    list-style: circle;
-    padding-left: 20px;
-    margin-bottom: 20px;
 }
 
 </style>
