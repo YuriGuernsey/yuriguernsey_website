@@ -18,9 +18,10 @@ const { slug } = Astro.params as Params;
 
 const project = await getProject(slug);
 const description = project.excerpt || project.description || "Project details from Yuri Guernsey.";
+const image = project.mainImage ? urlFor(project.mainImage).width(1200).height(630).fit("crop").url() : undefined;
 ---
 
-<Layout title={project.title || "Project"} description={description}>
+<Layout title={project.title || "Project"} description={description} image={image} type="article">
   <section class="content-page">
     <div class="content-shell content-shell--narrow">
       <a class="back-link" href="/project">Back to projects</a>

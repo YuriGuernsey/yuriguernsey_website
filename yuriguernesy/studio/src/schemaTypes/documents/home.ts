@@ -34,6 +34,8 @@ export default defineType({
     heroSubtitle: 'Founder / Product builder',
     heroparagraph:
       'Legocia, Aevea, and a rotating backlog of useful experiments. Shipping across software, automation, and hardware.',
+    heroOverlayColor: '#000000',
+    heroOverlayOpacity: 0.8,
     focusTags: ['Flutter', 'AI agents', 'Automation', 'Hardware', 'Local SaaS'],
     moreAboutMeLifeMission: [
       paragraph(
@@ -358,6 +360,37 @@ export default defineType({
       group: 'hero',
       initialValue:
         'Legocia, Aevea, and a rotating backlog of useful experiments. Shipping across software, automation, and hardware.',
+    }),
+    defineField({
+      name: 'heroBackgroundVideo',
+      title: 'Hero Background Video',
+      description: 'Looping background video shown behind the header and hero.',
+      type: 'file',
+      group: 'hero',
+      options: {
+        accept: 'video/mp4,video/webm,video/quicktime',
+      },
+    }),
+    defineField({
+      name: 'heroOverlayColor',
+      title: 'Hero Overlay Color',
+      description: 'Use a hex color such as #000000.',
+      type: 'string',
+      group: 'hero',
+      initialValue: '#000000',
+      validation: (Rule) =>
+        Rule.required().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, {
+          name: 'hex color',
+        }),
+    }),
+    defineField({
+      name: 'heroOverlayOpacity',
+      title: 'Hero Overlay Opacity',
+      description: 'Set a value between 0 and 1.',
+      type: 'number',
+      group: 'hero',
+      initialValue: 0.8,
+      validation: (Rule) => Rule.required().min(0).max(1),
     }),
     defineField({
       name: 'focusTags',

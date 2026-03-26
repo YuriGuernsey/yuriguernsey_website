@@ -1,17 +1,57 @@
 ---
 import { ViewTransitions } from "astro:transitions";
+import { urlFor } from "../utils/image";
+import { getSettings } from "../utils/sanity";
 
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  type?: "website" | "article";
+  noIndex?: boolean;
 }
 
+const settings = await getSettings();
+
 const {
-  title = "Portfolio 2026",
-  description = "Yuri Alves is a Guernsey-based builder creating practical software, automation systems, and experimental hardware.",
+  title = settings?.defaultTitle?.trim() || "Portfolio 2026",
+  description =
+    settings?.defaultDescription?.trim() ||
+    "Yuri Alves is a Guernsey-based builder creating practical software, automation systems, and experimental hardware.",
+  image,
+  type = "website",
+  noIndex = false,
 } = Astro.props;
 
-const pageTitle = title.startsWith("Yuri Guernsey") ? title : `Yuri Guernsey | ${title}`;
+const siteName = settings?.siteName?.trim() || "Yuri Guernsey";
+const siteUrl = settings?.siteUrl?.trim().replace(/\/$/, "") || "https://yuriguernsey.com";
+const pageTitle = title.startsWith(siteName) ? title : `${siteName} | ${title}`;
+const canonicalUrl = new URL(`${Astro.url.pathname}${Astro.url.search}`, siteUrl).toString();
+const themeColor = settings?.themeColor?.trim() || "#040404";
+const twitterHandle = settings?.twitterHandle?.trim();
+const defaultSocialImage = settings?.defaultOgImage
+  ? urlFor(settings.defaultOgImage).width(1200).height(630).fit("crop").url()
+  : "";
+const socialImage = image?.trim() || defaultSocialImage;
+const socialImageUrl = socialImage
+  ? socialImage.startsWith("http")
+    ? socialImage
+    : new URL(socialImage, siteUrl).toString()
+  : "";
+const faviconUrl = settings?.faviconUrl?.trim() || "/favicon.svg";
+const appleTouchIconUrl = settings?.appleTouchIconUrl?.trim();
+const twitterCard = socialImageUrl ? "summary_large_image" : "summary";
+
+function getFileType(url: string) {
+  const extension = url.split("?")[0]?.split(".")?.pop()?.toLowerCase();
+
+  if (extension === "svg") return "image/svg+xml";
+  if (extension === "png") return "image/png";
+  if (extension === "ico") return "image/x-icon";
+  return undefined;
+}
+
+const faviconType = getFileType(faviconUrl);
 ---
 
 <!DOCTYPE html>
@@ -19,20 +59,30 @@ const pageTitle = title.startsWith("Yuri Guernsey") ? title : `Yuri Guernsey | $
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" href={faviconUrl} type={faviconType} />
+    <link rel="shortcut icon" href={faviconUrl} />
+    {appleTouchIconUrl ? <link rel="apple-touch-icon" href={appleTouchIconUrl} /> : null}
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content={themeColor} />
     <meta name="description" content={description} />
     <meta name="title" content={pageTitle} />
+    <meta name="robots" content={noIndex ? "noindex, nofollow" : "index, follow"} />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://yuriguernsey.com/" />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:url" content={canonicalUrl} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
+    {socialImageUrl ? <meta property="og:image" content={socialImageUrl} /> : null}
 
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://yuriguernsey.com/" />
+    <meta property="twitter:card" content={twitterCard} />
+    <meta property="twitter:url" content={canonicalUrl} />
     <meta property="twitter:title" content={pageTitle} />
     <meta property="twitter:description" content={description} />
+    {twitterHandle ? <meta property="twitter:site" content={twitterHandle} /> : null}
+    {twitterHandle ? <meta property="twitter:creator" content={twitterHandle} /> : null}
+    {socialImageUrl ? <meta property="twitter:image" content={socialImageUrl} /> : null}
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />

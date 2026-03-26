@@ -28,6 +28,11 @@ const heroCurrentTitle = home?.heroSubtitle?.trim() || "Founder / Product builde
 const heroCurrentDescription =
   home?.heroparagraph?.trim() ||
   "Legocia, Aevea, and a rotating backlog of useful experiments. Shipping across software, automation, and hardware.";
+const heroBackgroundVideoUrl = home?.heroBackgroundVideoUrl?.trim() || "";
+const heroOverlayColor = home?.heroOverlayColor?.trim() || "#000000";
+const heroOverlayOpacity = Number.isFinite(home?.heroOverlayOpacity)
+  ? Math.max(0, Math.min(1, Number(home?.heroOverlayOpacity)))
+  : 0.8;
 
 const defaultFocusTags = ["Flutter", "AI agents", "Automation", "Hardware", "Local SaaS"];
 const focusTags = (home?.focusTags?.length ? home.focusTags : defaultFocusTags).map((tag) => normaliseTag(tag));
@@ -338,7 +343,21 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
 ---
 
 <Layout title={home?.seoTitle || "Portfolio 2026"} description={heroSummary}>
-  <div class="home-shell">
+  <section
+    class="home-top-stage"
+    id="top"
+    style={`--hero-overlay-color: ${heroOverlayColor}; --hero-overlay-opacity: ${heroOverlayOpacity};`}
+  >
+    {heroBackgroundVideoUrl ? (
+      <div class="home-top-stage__media" aria-hidden="true">
+        <video class="home-top-stage__video" autoplay muted loop playsinline preload="metadata">
+          <source src={heroBackgroundVideoUrl} />
+        </video>
+      </div>
+    ) : null}
+    <div class="home-top-stage__overlay" aria-hidden="true"></div>
+
+    <div class="home-shell home-shell--top">
     <header class="home-header">
       <div class="home-header__inner">
         <a class="home-brand" href="#top" aria-label="Yuri Guernsey portfolio home">
@@ -356,7 +375,7 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
       </div>
     </header>
 
-    <section class="home-hero" id="top">
+    <section class="home-hero">
       <div class="home-hero__grid">
         <div class="home-hero__main reveal">
           {(home?.lookingForWork || home?.availableForFreelance) && <p class="home-status">Open for hire</p>}
@@ -403,7 +422,10 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
         </aside>
       </div>
     </section>
+    </div>
+  </section>
 
+  <div class="home-shell">
     <section class="home-section" id="projects">
       <div class="home-section__head reveal">
         <div>
@@ -621,10 +643,47 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
   </script>
 
   <style>
+    .home-top-stage {
+      position: relative;
+      background: #020202;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .home-top-stage__media,
+    .home-top-stage__overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .home-top-stage__media {
+      z-index: 0;
+    }
+
+    .home-top-stage__video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.02);
+    }
+
+    .home-top-stage__overlay {
+      z-index: 1;
+      background: var(--hero-overlay-color, #000000);
+      opacity: var(--hero-overlay-opacity, 0.8);
+    }
+
     .home-shell {
       width: min(calc(100% - 40px), 1240px);
       margin: 0 auto;
       padding-bottom: 28px;
+    }
+
+    .home-shell--top {
+      position: relative;
+      z-index: 2;
+      padding-bottom: 0;
     }
 
     .home-header {

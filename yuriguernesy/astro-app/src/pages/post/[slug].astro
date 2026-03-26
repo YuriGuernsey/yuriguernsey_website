@@ -18,9 +18,10 @@ const { slug } = Astro.params as Params;
 
 const post = await getBlogPost(slug);
 const description = post.excerpt || "Build notes and experiments from Yuri Guernsey.";
+const image = post.mainImage ? urlFor(post.mainImage).width(1200).height(630).fit("crop").url() : undefined;
 ---
 
-<Layout title={post.title || "Build log"} description={description}>
+<Layout title={post.title || "Build log"} description={description} image={image} type="article">
   <section class="content-page">
     <div class="content-shell content-shell--narrow">
       <a class="back-link" href="/post">Back to posts</a>

@@ -21,15 +21,22 @@ export async function getBlogPost(slug: string): Promise<Post> {
 
 export async function getHomepage(): Promise<Home> {
   return await sanityClient.fetch(
-    groq`*[_type == "home" && _id == "home"][0]`
+    groq`*[_type == "home" && _id == "home"][0]{
+      ...,
+      "heroBackgroundVideoUrl": heroBackgroundVideo.asset->url
+    }`
   );
 }
 
 
 
-export async function getSettings(): Promise<Settings[]> {
+export async function getSettings(): Promise<Settings | null> {
   return await sanityClient.fetch(
-    groq`*[_type == "settings"]`
+    groq`*[_type == "settings" && _id == "settings"][0]{
+      ...,
+      "faviconUrl": favicon.asset->url,
+      "appleTouchIconUrl": appleTouchIcon.asset->url
+    }`
   );
 }
 
@@ -69,6 +76,9 @@ export interface Home {
   heroSubtitle?: string;
   herosubheading?: string;
   heroparagraph?: string;
+  heroBackgroundVideoUrl?: string;
+  heroOverlayColor?: string;
+  heroOverlayOpacity?: number;
   seoTitle?: string;
   availableForFreelance?: boolean;
   lookingForWork?: boolean;
@@ -143,10 +153,15 @@ export interface Settings {
   _type: "settings";
   _createdAt: string;
   title?: string;
-  slug: Slug;
-  excerpt?: string;
-  mainImage?: ImageAsset & { alt?: string };
-  body: PortableTextBlock[];
+  siteName?: string;
+  siteUrl?: string;
+  defaultTitle?: string;
+  defaultDescription?: string;
+  twitterHandle?: string;
+  themeColor?: string;
+  defaultOgImage?: ImageAsset & { alt?: string };
+  faviconUrl?: string;
+  appleTouchIconUrl?: string;
 }
 
 
