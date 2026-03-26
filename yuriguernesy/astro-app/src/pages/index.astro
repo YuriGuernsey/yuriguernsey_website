@@ -361,7 +361,7 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
         <div class="home-hero__main reveal">
           {(home?.lookingForWork || home?.availableForFreelance) && <p class="home-status">Open for hire</p>}
           <p class="home-eyebrow">{heroEyebrow}</p>
-          <h1>{heroTitle.replace("days", "")}{heroTitle.includes("days") ? <><em>days</em>{heroTitle.split("days")[1]}</> : null}</h1>
+          <h1>{heroTitle}</h1>
           <p class="home-summary">{heroSummary}</p>
 
           <div class="home-actions">
