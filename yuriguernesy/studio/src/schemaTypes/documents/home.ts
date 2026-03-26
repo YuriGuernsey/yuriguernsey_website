@@ -140,11 +140,6 @@ export default defineType({
         'The work ranges from mobile apps and internal systems to AI workflows and edge-device experiments, but the principle is consistent: build something useful, keep it understandable, and automate anything repetitive.',
       ),
     ],
-    moreAboutMeHighlights: [
-      paragraph(
-        'Product-focused engineer and entrepreneur blending software, AI, automation, and hardware into practical systems that solve real problems.',
-      ),
-    ],
     aboutPanels: [
       {
         label: 'Core identity',
@@ -194,6 +189,14 @@ export default defineType({
           'Ship fast, iterate faster',
           'Build real things, not just ideas',
           'Prefer simple systems over clever ones',
+        ],
+      },
+      {
+        label: 'Interesting bits',
+        items: [
+          'Founder of Legocia, a privacy-first wearable memory product',
+          'Building an automation-heavy agency operating model',
+          'Comfortable moving between product, code, systems, and hardware',
         ],
       },
     ],
@@ -432,12 +435,6 @@ export default defineType({
     defineField({
       name: 'moreAboutMe',
       title: 'About Copy',
-      type: 'blockContent',
-      group: 'sections',
-    }),
-    defineField({
-      name: 'moreAboutMeHighlights',
-      title: 'Highlights',
       type: 'blockContent',
       group: 'sections',
     }),

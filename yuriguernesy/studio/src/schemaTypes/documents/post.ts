@@ -56,21 +56,14 @@ export default defineType({
           {
   name: 'tags',
   title: 'Tags',
+  description:
+    'Add any tags that help describe the post. Suggested examples: build, dev-log, brain-dump, tutorial, idea, automation, hardware, meta.',
   type: 'array',
   of: [{ type: 'string' }],
   options: {
-    list: [
-      { title: 'Build', value: 'build' },
-      { title: 'Dev Log', value: 'dev-log' },
-      { title: 'Brain Dump', value: 'brain-dump' },
-      { title: 'Tutorial', value: 'tutorial' },
-      { title: 'Idea', value: 'idea' },
-      { title: 'Automation', value: 'automation' },
-      { title: 'Stack', value: 'stack' },
-      { title: 'Hardware', value: 'hardware' },
-      { title: 'Meta', value: 'meta' },
-    ],
+    layout: 'tags',
   },
+  validation: (Rule) => Rule.unique(),
 }
     )
   ],

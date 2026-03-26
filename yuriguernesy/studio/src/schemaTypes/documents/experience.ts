@@ -65,6 +65,18 @@ defineField({
       type: 'string'
     }),
     defineField({
+      name: 'tags',
+      title: 'Tags',
+      description:
+        'Use any tags that help explain the role. Examples: Flutter, Vue.js, PHP/Laravel, Cloudflare, automation, product.',
+      type: 'array',
+      of: [{type: 'string'}],
+      options: {
+        layout: 'tags',
+      },
+      validation: (Rule) => Rule.unique(),
+    }),
+    defineField({
       name: 'mainImage',
       title: 'Main image',
       type: 'image',
@@ -90,12 +102,13 @@ defineField({
   select: {
     title: 'title',
     company: 'company',
+    tags: 'tags',
     media: 'mainImage',
   },
-    prepare({ title, company, media }) {
+    prepare({ title, company, tags, media }) {
     return {
       title,
-      subtitle: company, // turn array into comma-separated string
+      subtitle: [company, tags?.join(', ')].filter(Boolean).join(' • '),
       media,
     }
   }

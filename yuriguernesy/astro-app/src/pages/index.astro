@@ -222,14 +222,7 @@ const noteCards = home?.noteCards?.length
 
 const aboutPanels = home?.aboutPanels?.length
   ? home.aboutPanels.filter((panel) => panel?.label && panel?.body?.length)
-  : [
-      ...(home?.moreAboutMeHighlights?.length
-        ? [{label: "Highlights", body: home.moreAboutMeHighlights}]
-        : []),
-      ...(home?.moreAboutMeLifeMission?.length
-        ? [{label: "Life mission", body: home.moreAboutMeLifeMission}]
-        : []),
-    ];
+  : [];
 
 const defaultManualGroups = [
   {
@@ -332,6 +325,15 @@ function getJobSummary(job: (typeof featuredJobs)[number]) {
     `${job.employmentType ? `${job.employmentType} role.` : "Role."} ${job.location ? `Based in ${job.location}.` : ""}`.trim();
 
   return summary.length > 210 ? `${summary.slice(0, 207).trimEnd()}...` : summary;
+}
+
+function getJobMeta(job: (typeof featuredJobs)[number]) {
+  return [
+    ...(job.tags?.map((tag) => normaliseTag(tag)) || []),
+    job.employmentType ? normaliseTag(job.employmentType) : "",
+    job.location || "",
+    job.currentlyEmployed ? "Current" : "Completed",
+  ].filter((value, index, values) => value && values.indexOf(value) === index);
 }
 ---
 
@@ -458,9 +460,9 @@ function getJobSummary(job: (typeof featuredJobs)[number]) {
                 <p>{getJobSummary(job)}</p>
               </div>
               <div class="home-work-stack">
-                {job.employmentType && <span>{normaliseTag(job.employmentType)}</span>}
-                {job.location && <span>{job.location}</span>}
-                <span>{job.currentlyEmployed ? "Current" : "Completed"}</span>
+                {getJobMeta(job).map((meta) => (
+                  <span>{meta}</span>
+                ))}
               </div>
             </article>
           ))

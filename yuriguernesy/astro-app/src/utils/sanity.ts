@@ -89,7 +89,6 @@ export interface Home {
   connectSecondaryAction?: ActionLink;
   connectCards?: ConnectCard[];
   moreAboutMe?: PortableTextBlock[];
-  moreAboutMeHighlights?: PortableTextBlock[];
   moreAboutMeLifeMission?: PortableTextBlock[];
 }
 
@@ -173,6 +172,7 @@ export interface Job {
   employmentType?: string;
   endDate: string;
   location: string;
+  tags?: string[];
   title: string;
   startDate: string;
 }

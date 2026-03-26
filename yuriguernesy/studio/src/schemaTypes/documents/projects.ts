@@ -61,19 +61,14 @@ export default defineType({
           {
   name: 'tags',
   title: 'Tags',
+  description:
+    'Add any tags that help describe the project. Suggested examples: automation, website, web-app, mobile-app, ai, hardware.',
   type: 'array',
   of: [{ type: 'string' }],
   options: {
-    list: [
-      { title: 'Automation', value: 'automation' },
-      { title: 'Website', value: 'website' },
-      { title: 'Web App', value: 'web-app' },
-      { title: 'Mobile App', value: 'mobile-app' },
-      { title: 'AI', value: 'ai' },
-      { title: 'Hardware', value: 'hardware' },
-    
-    ],
+    layout: 'tags',
   },
+  validation: (Rule) => Rule.unique(),
 }
     )
   ],
