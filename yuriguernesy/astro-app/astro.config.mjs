@@ -1,21 +1,18 @@
-// Loading environment variables from .env files
-// https://docs.astro.build/en/guides/configuring-astro/#environment-variables
 import { loadEnv } from "vite";
-// const {
-//   PUBLIC_SANITY_STUDIO_PROJECT_ID,
-//   PUBLIC_SANITY_STUDIO_DATASET,
-//   PUBLIC_SANITY_PROJECT_ID,
-//   PUBLIC_SANITY_DATASET,
-// } = loadEnv(import.meta.env.MODE, process.cwd(), "");
 import { defineConfig } from "astro/config";
-
-// // Different environments use different variables
-// const projectId = PUBLIC_SANITY_STUDIO_PROJECT_ID || PUBLIC_SANITY_PROJECT_ID;
-// const dataset = PUBLIC_SANITY_STUDIO_DATASET || PUBLIC_SANITY_DATASET;
-
 import sanity from "@sanity/astro";
 import react from "@astrojs/react";
 import netlify from '@astrojs/netlify';
+
+const env = loadEnv(process.env.NODE_ENV || "development", process.cwd(), "");
+const projectId =
+  env.PUBLIC_SANITY_STUDIO_PROJECT_ID ||
+  env.PUBLIC_SANITY_PROJECT_ID ||
+  "ek5zr1zv";
+const dataset =
+  env.PUBLIC_SANITY_STUDIO_DATASET ||
+  env.PUBLIC_SANITY_DATASET ||
+  "production";
 
 // https://astro.build/config
 export default defineConfig({
@@ -26,8 +23,8 @@ export default defineConfig({
 }),
   integrations: [
     sanity({
-      projectId: 'ek5zr1zv',
-      dataset: 'production',
+      projectId,
+      dataset,
       // studioBasePath: "/admin",
       useCdn: false,
       // `false` if you want to ensure fresh data

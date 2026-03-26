@@ -2,8 +2,8 @@
 import type { InferGetStaticParamsType } from "astro";
 import { PortableText } from "astro-portabletext";
 import Layout from "../../layouts/Layout.astro";
-import { formatDate } from "../../utils";
 import { urlFor } from "../../utils/image";
+import { formatDate, normaliseTag } from "../../utils";
 import { getBlogPost, getBlogPosts } from "../../utils/sanity";
 
 export async function getStaticPaths() {
@@ -17,32 +17,40 @@ type Params = InferGetStaticParamsType<typeof getStaticPaths>;
 const { slug } = Astro.params as Params;
 
 const post = await getBlogPost(slug);
+const description = post.excerpt || "Build notes and experiments from Yuri Guernsey.";
 ---
 
-<Layout title={post.title!}>
+<Layout title={post.title || "Build log"} description={description}>
+  <section class="content-page">
+    <div class="content-shell content-shell--narrow">
+      <a class="back-link" href="/post">Back to posts</a>
 
-  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <a href="/" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white mb-6">
-  ← Back to Home
-</a>
-    {post.mainImage && (
-      <img
-        src={urlFor(post.mainImage).url()}
-        alt={post.title}
-        class="w-full h-64 object-cover rounded-md mb-8"
-      />
-    )}
-    <h1 class="text-4xl font-bold dark:text-white mb-4">
-      {post.title}
-    </h1>
-    <p class="text-lg text-gray-600 dark:text-gray-300 mb-2">
-      {post.excerpt}
-    </p>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-      {formatDate(post._createdAt)}
-    </p>
-    <div class="prose prose-lg dark:prose-invert p-4 [&>ul]:list-disc [&>ul]:list-inside [&>ul]:pl-5 [&>ul]:mb-[20px] [&>p]:mb-[20px]">
-      <PortableText value={post.body} />
+      <article class="detail-article">
+        {post.mainImage && (
+          <img
+            src={urlFor(post.mainImage).url()}
+            alt={post.mainImage.alt || post.title || "Post image"}
+            class="detail-cover"
+          />
+        )}
+
+        <span class="content-overline">Build log</span>
+        <h1 class="detail-title">{post.title}</h1>
+        <p class="detail-excerpt">{description}</p>
+        <p class="detail-meta">{formatDate(post._createdAt)}</p>
+
+        {post.tags?.length ? (
+          <div class="detail-tags">
+            {post.tags.map((tag) => (
+              <span>{normaliseTag(tag)}</span>
+            ))}
+          </div>
+        ) : null}
+
+        <div class="rich-text">
+          <PortableText value={post.body} />
+        </div>
+      </article>
     </div>
-  </article>
+  </section>
 </Layout>

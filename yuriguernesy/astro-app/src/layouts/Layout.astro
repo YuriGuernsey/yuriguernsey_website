@@ -1,104 +1,304 @@
 ---
-// https://docs.astro.build/en/guides/view-transitions/
-import { ViewTransitions } from 'astro:transitions';
+import { ViewTransitions } from "astro:transitions";
 
 interface Props {
   title?: string;
+  description?: string;
 }
 
-const { title } = Astro.props;
+const {
+  title = "Portfolio 2026",
+  description = "Yuri Alves is a Guernsey-based builder creating practical software, automation systems, and experimental hardware.",
+} = Astro.props;
+
+const pageTitle = title.startsWith("Yuri Guernsey") ? title : `Yuri Guernsey | ${title}`;
 ---
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width"
-    />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/favicon.svg"
-    />
-    <meta
-      name="generator"
-      content={Astro.generator}
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="title" content={pageTitle} />
 
-    <!-- Google fonts -->
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yuriguernsey.com/" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
 
-    <title>YuriGuernsey | {title}</title>
-     <meta name="title" content="YuriGuernsey | Software Development Portfolio"/>
-        <meta name="description" content="Hello, I'm YuriGuernsey, a versatile and dedicated software developer. With a passion for technology and a knack for mastering various facets of software development, I proudly consider myself a 'Jack of all trades' in this dynamic field. Explore my portfolio to witness a diverse range of projects and skills that showcase my adaptability and expertise in creating innovative solutions"/>
-        <!-- Open Graph / Facebook -->
-        <meta property="og:type" content="website"/>
-        <meta property="og:url" content="https://yuriguernsey.com/"/>
-        <meta property="og:title" content="YuriGuernsey | Software Development Portfolio"/>
-        <meta property="og:description" content="Hello, I'm YuriGuernsey, a versatile and dedicated software developer. With a passion for technology and a knack for mastering various facets of software development, I proudly consider myself a 'Jack of all trades' in this dynamic field. Explore my portfolio to witness a diverse range of projects and skills that showcase my adaptability and expertise in creating innovative solutions"/>
-        <meta property="og:image" content="/public/assets/meta_image.png"/>
-        <!-- Twitter -->
-        <meta property="twitter:card" content="summary_large_image"/>
-        <meta property="twitter:url" content="https://yuriguernsey.com/"/>
-        <meta property="twitter:title" content="YuriGuernsey | Software Development Portfolio"/>
-        <meta property="twitter:description" content="Hello, I'm YuriGuernsey, a versatile and dedicated software developer. With a passion for technology and a knack for mastering various facets of software development, I proudly consider myself a 'Jack of all trades' in this dynamic field. Explore my portfolio to witness a diverse range of projects and skills that showcase my adaptability and expertise in creating innovative solutions"/>
-        <meta property="twitter:image" content="/public/assets/meta_image.png"/>
-        <!-- Meta Tags Generated with https://metatags.io -->
-        <script src="https://cdn.tailwindcss.com" is:inline async></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://yuriguernsey.com/" />
+    <meta property="twitter:title" content={pageTitle} />
+    <meta property="twitter:description" content={description} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <title>{pageTitle}</title>
 
     <ViewTransitions />
-<style>
-*{
-  margin: 0;
-  padding: 0;  
-}
-html{
-  font-family: Poppins;
-  color: #f0f0f0;
-  scroll-behavior: smooth;
-	overflow: scroll
-}
-body{
-  min-height: 100vh;
-  margin: 0;
-    padding: 0;
-    overflow: hidden;
-    font-family: 'Poppins', sans-serif;
-    background-color: #151B22;
-    color: white;
-}
 
-body > div >main > section:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)):not(:nth-child(5)) ul {
-    list-style: circle;
-    padding-left: 20px;
-    margin-bottom: 20px;
-}
-.yellow{
-    color: #DAC400;
-}
+    <style is:global>
+      :root {
+        --bg: #040404;
+        --panel: #0b0b0b;
+        --panel-soft: #111111;
+        --text: #f4f4ef;
+        --muted: #a1a19a;
+        --line: rgba(255, 255, 255, 0.16);
+        --line-soft: rgba(255, 255, 255, 0.08);
+        --accent: #ffe600;
+        --accent-soft: rgba(255, 230, 0, 0.16);
+        --max: 1240px;
+        --radius: 12px;
+      }
 
+      * {
+        box-sizing: border-box;
+      }
 
-</style>
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          linear-gradient(90deg, transparent 0 6%, rgba(255, 255, 255, 0.03) 6% 6.08%, transparent 6.08% 100%),
+          linear-gradient(180deg, transparent 0 8%, rgba(255, 255, 255, 0.03) 8% 8.08%, transparent 8.08% 100%);
+        opacity: 0.3;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      main {
+        position: relative;
+        z-index: 1;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      .content-page {
+        padding: 42px 0 68px;
+      }
+
+      .content-shell {
+        width: min(calc(100% - 40px), 1080px);
+        margin: 0 auto;
+      }
+
+      .content-shell--narrow {
+        width: min(calc(100% - 40px), 860px);
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 22px;
+        color: rgba(244, 244, 239, 0.74);
+        text-decoration: none;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .content-header {
+        display: grid;
+        gap: 10px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .content-overline,
+      .entry-meta,
+      .detail-meta,
+      .detail-tags span {
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .content-overline,
+      .entry-meta,
+      .detail-meta {
+        color: var(--muted);
+      }
+
+      .content-title,
+      .detail-title {
+        margin: 0;
+        font-size: clamp(2.4rem, 6vw, 4.6rem);
+        line-height: 0.94;
+        font-weight: 700;
+        letter-spacing: -0.08em;
+        text-transform: uppercase;
+      }
+
+      .content-lede,
+      .detail-excerpt {
+        max-width: 44rem;
+        color: rgba(244, 244, 239, 0.76);
+        line-height: 1.68;
+      }
+
+      .content-list {
+        display: grid;
+        gap: 0;
+        padding-top: 16px;
+      }
+
+      .content-entry {
+        display: grid;
+        gap: 10px;
+        padding: 18px 0 20px;
+        border-bottom: 1px solid var(--line-soft);
+        text-decoration: none;
+        transition: transform 160ms ease, border-color 160ms ease;
+      }
+
+      .content-entry:hover {
+        transform: translateX(6px);
+        border-color: rgba(255, 230, 0, 0.3);
+      }
+
+      .entry-title {
+        margin: 0;
+        font-size: 1.35rem;
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        text-transform: uppercase;
+      }
+
+      .entry-copy {
+        color: rgba(244, 244, 239, 0.72);
+        line-height: 1.64;
+      }
+
+      .entry-tags,
+      .detail-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .entry-tags span,
+      .detail-tags span {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 0 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: rgba(244, 244, 239, 0.84);
+      }
+
+      .detail-article {
+        padding-top: 8px;
+      }
+
+      .detail-cover {
+        width: 100%;
+        max-height: 440px;
+        object-fit: cover;
+        border-radius: var(--radius);
+        border: 1px solid var(--line);
+        background: var(--panel);
+        margin-bottom: 24px;
+      }
+
+      .detail-excerpt {
+        margin-top: 14px;
+      }
+
+      .detail-meta {
+        margin-top: 16px;
+      }
+
+      .detail-tags {
+        margin-top: 16px;
+      }
+
+      .rich-text {
+        margin-top: 28px;
+        color: rgba(244, 244, 239, 0.78);
+        line-height: 1.8;
+      }
+
+      .rich-text h2,
+      .rich-text h3 {
+        margin: 2rem 0 0.8rem;
+        font-size: 1.45rem;
+        line-height: 1.1;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+      }
+
+      .rich-text p,
+      .rich-text ul,
+      .rich-text ol,
+      .rich-text blockquote {
+        margin: 0 0 1rem;
+      }
+
+      .rich-text ul,
+      .rich-text ol {
+        padding-left: 1.25rem;
+      }
+
+      .rich-text li + li {
+        margin-top: 0.45rem;
+      }
+
+      .rich-text a {
+        color: var(--accent);
+      }
+
+      @media (max-width: 720px) {
+        .content-page {
+          padding: 28px 0 52px;
+        }
+
+        .content-shell,
+        .content-shell--narrow {
+          width: min(calc(100% - 28px), 1080px);
+        }
+
+        .content-title,
+        .detail-title {
+          font-size: clamp(2rem, 12vw, 3.2rem);
+        }
+      }
+    </style>
   </head>
-  <body class="flex justify-center">
-    <div class="container">
-     
-      <main>
-        <slot />
-      </main>
-      
-    </div>
+  <body>
+    <main>
+      <slot />
+    </main>
   </body>
 </html>

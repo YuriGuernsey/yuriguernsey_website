@@ -9,7 +9,7 @@ export function urlFor(source: Image) {
 }
 
 export async function urlforFile(){
- const query = `*[_type == "home"][0]{ "cvUrl": cv.asset->url }`;
+ const query = `*[_type == "home" && _id == "home"][0]{ "cvUrl": cv.asset->url }`;
 
 const homeData = await sanityClient.fetch(query);
 const cvUrl = homeData?.cvUrl;

@@ -21,7 +21,7 @@ export async function getBlogPost(slug: string): Promise<Post> {
 
 export async function getHomepage(): Promise<Home> {
   return await sanityClient.fetch(
-    groq`*[_type == "home"][0]`
+    groq`*[_type == "home" && _id == "home"][0]`
   );
 }
 
@@ -29,7 +29,7 @@ export async function getHomepage(): Promise<Home> {
 
 export async function getSettings(): Promise<Settings[]> {
   return await sanityClient.fetch(
-    groq`*[_type == "settings"`
+    groq`*[_type == "settings"]`
   );
 }
 
@@ -61,6 +61,10 @@ export async function getExperience(): Promise<Job[]> {
 export interface Home {
   _type: "home";
   _createdAt: string;
+  brandPrefix?: string;
+  brandAccent?: string;
+  brandMeta?: string;
+  heroEyebrow?: string;
   heroTitle?: string;
   heroSubtitle?: string;
   herosubheading?: string;
@@ -69,9 +73,71 @@ export interface Home {
   availableForFreelance?: boolean;
   lookingForWork?: boolean;
   cv?:string;
-  moreAboutMe: PortableTextBlock[];
-  moreAboutMeHighlights: PortableTextBlock[];
-  moreAboutMeLifeMission: PortableTextBlock[];
+  heroPrimaryAction?: ActionLink;
+  heroSecondaryAction?: ActionLink;
+  focusTags?: string[];
+  projectsSection?: SectionIntro;
+  featuredProjectCards?: FeatureCard[];
+  workSection?: SectionIntro;
+  notesSection?: SectionIntro;
+  noteCards?: NoteCard[];
+  aboutSection?: SectionIntro;
+  aboutPanels?: TextPanel[];
+  manualGroups?: ManualGroup[];
+  connectSection?: SectionIntro;
+  connectPrimaryAction?: ActionLink;
+  connectSecondaryAction?: ActionLink;
+  connectCards?: ConnectCard[];
+  moreAboutMe?: PortableTextBlock[];
+  moreAboutMeHighlights?: PortableTextBlock[];
+  moreAboutMeLifeMission?: PortableTextBlock[];
+}
+
+export interface ActionLink {
+  label?: string;
+  href?: string;
+  variant?: "primary" | "secondary";
+}
+
+export interface SectionIntro {
+  overline?: string;
+  title?: string;
+  description?: string;
+}
+
+export interface FeatureCard {
+  posterLabel?: string;
+  ribbonTags?: string[];
+  posterSummary?: string;
+  title?: string;
+  description?: string;
+  tags?: string[];
+  href?: string;
+}
+
+export interface NoteCard {
+  meta?: string;
+  title?: string;
+  description?: string;
+  linkLabel?: string;
+  href?: string;
+}
+
+export interface ManualGroup {
+  label?: string;
+  items?: string[];
+}
+
+export interface ConnectCard {
+  label?: string;
+  title?: string;
+  description?: string;
+  href?: string;
+}
+
+export interface TextPanel {
+  label?: string;
+  body?: PortableTextBlock[];
 }
 
 export interface Settings {
@@ -91,9 +157,10 @@ export interface Post {
   title?: string;
   slug: Slug;
   excerpt?: string;
-  discription?: string;
+  description?: string;
   mainImage?: ImageAsset & { alt?: string };
   body: PortableTextBlock[];
+  tags?: string[];
 }
 
 export interface Job {
@@ -102,11 +169,10 @@ export interface Job {
   _createdAt: string;
   body: PortableTextBlock[];
   company: string;
-  currentlyEmployed: string;
+  currentlyEmployed: boolean;
   employmentType?: string;
   endDate: string;
   location: string;
   title: string;
   startDate: string;
 }
-

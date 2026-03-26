@@ -1,444 +1,1267 @@
 ---
 import { PortableText } from "astro-portabletext";
-import Card from "../components/Card.astro";
-import Welcome from "../components/Welcome.astro";
 import Layout from "../layouts/Layout.astro";
-import { urlFor, urlforFile } from "../utils/image";
-import { getBlogPosts, getHomepage, getProjects, getExperience } from "../utils/sanity";
+import { urlforFile } from "../utils/image";
+import { formatRange, normaliseTag, toPlainText } from "../utils";
+import { getBlogPosts, getExperience, getHomepage, getProjects } from "../utils/sanity";
+import type { ActionLink, SectionIntro } from "../utils/sanity";
 
 const posts = await getBlogPosts();
 const projects = await getProjects();
-const home = await getHomepage();
 const jobs = await getExperience();
+const home = await getHomepage();
 const cvURL = await urlforFile();
 
-function returnDateToString(rawDate:any){
-  return new Date(rawDate).toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-});
+const featuredPosts = posts.slice(0, 4);
+const featuredJobs = jobs.slice(0, 6);
+
+const brandPrefix = home?.brandPrefix?.trim() || "Yuri";
+const brandAccent = home?.brandAccent?.trim() || "Guernsey";
+const brandMeta = home?.brandMeta?.trim() || "Portfolio / 2026";
+
+const heroEyebrow = home?.heroEyebrow?.trim() || "Guernsey based / working worldwide";
+const heroTitle = home?.heroTitle?.trim() || "I build real systems in days, not months.";
+const heroSummary =
+  home?.herosubheading?.trim() ||
+  "Mobile apps, automation systems, AI workflows, and experiments that actually ship. Based in Guernsey. Built for real problems, not pitch decks.";
+const heroCurrentTitle = home?.heroSubtitle?.trim() || "Founder / Product builder";
+const heroCurrentDescription =
+  home?.heroparagraph?.trim() ||
+  "Legocia, Aevea, and a rotating backlog of useful experiments. Shipping across software, automation, and hardware.";
+
+const defaultFocusTags = ["Flutter", "AI agents", "Automation", "Hardware", "Local SaaS"];
+const focusTags = (home?.focusTags?.length ? home.focusTags : defaultFocusTags).map((tag) => normaliseTag(tag));
+
+function withDefaultSection(section: SectionIntro | undefined, fallback: Required<SectionIntro>) {
+  return {
+    overline: section?.overline?.trim() || fallback.overline,
+    title: section?.title?.trim() || fallback.title,
+    description: section?.description?.trim() || fallback.description,
+  };
 }
 
-function returnShortDateToString(rawDate:any){
-  return new Date(rawDate).toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'short',
+function withDefaultAction(action: ActionLink | undefined, fallback: Required<ActionLink>) {
+  return {
+    label: action?.label?.trim() || fallback.label,
+    href: action?.href?.trim() || fallback.href,
+    variant: action?.variant || fallback.variant,
+  };
+}
+
+const heroPrimaryAction = withDefaultAction(home?.heroPrimaryAction, {
+  label: "Featured work",
+  href: "#projects",
+  variant: "primary",
 });
+
+const heroSecondaryAction = home?.heroSecondaryAction?.href
+  ? withDefaultAction(home.heroSecondaryAction, {
+      label: "Operating manual",
+      href: "#about",
+      variant: "secondary",
+    })
+  : cvURL
+    ? {
+        label: home?.heroSecondaryAction?.label?.trim() || "Download resume",
+        href: `${cvURL}?dl`,
+        variant: "secondary",
+      }
+    : withDefaultAction(home?.heroSecondaryAction, {
+        label: "Operating manual",
+        href: "#about",
+        variant: "secondary",
+      });
+
+const projectsSection = withDefaultSection(home?.projectsSection, {
+  overline: "Current bets",
+  title: "Featured projects",
+  description:
+    "Three active directions: a privacy-first wearable, an automation-first agency model, and a stream of practical software experiments.",
+});
+
+const workSection = withDefaultSection(home?.workSection, {
+  overline: "Selected roles",
+  title: "Work",
+  description: "Startups, enterprise systems, and founder mode. Different environments, same delivery bias.",
+});
+
+const notesSection = withDefaultSection(home?.notesSection, {
+  overline: "Process",
+  title: "Build logs, experiments & rants",
+  description: "No fluff. Just the process, the systems, the failures, and the ideas worth testing properly.",
+});
+
+const aboutSection = withDefaultSection(home?.aboutSection, {
+  overline: "Long form",
+  title: "You want to know more? OK.",
+  description: "The broad picture, the working style, and the systems behind the shipping bias.",
+});
+
+const connectSection = withDefaultSection(home?.connectSection, {
+  overline: "Elsewhere",
+  title: "Let's connect",
+  description: "Got an idea? A project? A weird challenge? Use this section for contact points, profiles, and the next obvious click.",
+});
+
+const connectPrimaryAction = withDefaultAction(home?.connectPrimaryAction, {
+  label: "Featured work",
+  href: "#projects",
+  variant: "primary",
+});
+
+const connectSecondaryAction = withDefaultAction(home?.connectSecondaryAction, {
+  label: "View all posts",
+  href: "/post",
+  variant: "secondary",
+});
+
+const defaultFeatureCards = [
+  {
+    posterLabel: "Legocia",
+    ribbonTags: ["Privacy first", "Wearable", "Always on"],
+    posterSummary: "Continuous life capture, sensitive-content redaction, and secure personal memory recall.",
+    title: "Legocia",
+    description: "A long-term product bet on remembering more without turning life into surveillance.",
+    tags: ["AI redaction", "Raspberry Pi", "Secure storage"],
+    href: "#work",
+  },
+  {
+    posterLabel: "Agency OS",
+    ribbonTags: ["Automation first", "Ops", "Delivery"],
+    posterSummary:
+      "AI agents handling sales, onboarding, support, and service delivery until a human decision actually matters.",
+    title: "Aevea operating model",
+    description: "An agency system designed for operational leverage instead of more manual overhead.",
+    tags: ["n8n", "Lead automation", "Productised services"],
+    href: "#work",
+  },
+  {
+    posterLabel: "Useful builds",
+    ribbonTags: ["Local SaaS", "Utility", "Experiments"],
+    posterSummary:
+      "Boring-but-useful software, Guernsey-focused tools, and slightly unhinged side projects with a point.",
+    title: "Useful experiments",
+    description:
+      "From OnTheTinkle to GympleBuddy to scheduling assistants, the point is always the same: ship fast and learn from reality.",
+    tags: ["OnTheTinkle", "GympleBuddy", "Scheduling agents"],
+    href: "#notes",
+  },
+];
+
+const projectDocCards = projects.slice(0, 3).map((project) => ({
+  posterLabel: project.title || "Project",
+  ribbonTags: project.tags?.slice(0, 3)?.map((tag) => normaliseTag(tag)) || ["Featured"],
+  posterSummary: project.description || project.excerpt || "Read the project.",
+  title: project.title || "Project",
+  description: project.excerpt || project.description || "Read the project.",
+  tags: project.tags?.slice(0, 3)?.map((tag) => normaliseTag(tag)) || [],
+  href: `/project/${project.slug.current}`,
+}));
+
+const featureCards = (home?.featuredProjectCards?.length
+  ? home.featuredProjectCards.map((card) => ({
+      posterLabel: card.posterLabel || card.title || "Feature",
+      ribbonTags: (card.ribbonTags?.length ? card.ribbonTags : card.tags || ["Featured"]).map((tag) => normaliseTag(tag)),
+      posterSummary: card.posterSummary || card.description || "",
+      title: card.title || card.posterLabel || "Feature",
+      description: card.description || card.posterSummary || "",
+      tags: (card.tags || []).map((tag) => normaliseTag(tag)),
+      href: card.href || "#projects",
+    }))
+  : [...projectDocCards, ...defaultFeatureCards]).slice(0, 3);
+
+const defaultNoteCards = [
+  {
+    meta: "Wearable systems / 2026",
+    title: "How do you capture more of life without building surveillance?",
+    description: "The Legocia problem space: memory, privacy, redaction, and the reality of always-on devices.",
+    linkLabel: "Read the project",
+    href: "#projects",
+  },
+  {
+    meta: "Agency ops / 2026",
+    title: "Can an agency run mostly on agents?",
+    description: "Sales, onboarding, support, and delivery workflows pushed toward automation without losing judgment.",
+    linkLabel: "Read the work",
+    href: "#work",
+  },
+  {
+    meta: "Local software / 2026",
+    title: "Why boring Guernsey utilities are worth building",
+    description: "Small local problems are still real problems, and often easier to validate than shiny global ideas.",
+    linkLabel: "Read the thinking",
+    href: "#about",
+  },
+  {
+    meta: "Experiments / ongoing",
+    title: "Useful, weird, or slightly unhinged. Preferably all three.",
+    description:
+      "OnTheTinkle, GympleBuddy, scheduling assistants, subscription concepts, and whatever survives contact with users.",
+    linkLabel: "Read the current mode",
+    href: "#connect",
+  },
+];
+
+const noteCards = home?.noteCards?.length
+  ? home.noteCards.map((card) => ({
+      meta: card.meta || "Build log",
+      title: card.title || "Untitled note",
+      description: card.description || "",
+      linkLabel: card.linkLabel || "Read more",
+      href: card.href || "#notes",
+    })).slice(0, 4)
+  : featuredPosts.length
+    ? featuredPosts.map((post) => ({
+        meta: `${post.tags?.[0] ? normaliseTag(post.tags[0]) : "Build log"} / ${new Date(post._createdAt).getFullYear()}`,
+        title: post.title || "Untitled post",
+        description: post.excerpt || "Read the post.",
+        linkLabel: "Read more",
+        href: `/post/${post.slug.current}`,
+      })).slice(0, 4)
+    : defaultNoteCards;
+
+const aboutPanels = home?.aboutPanels?.length
+  ? home.aboutPanels.filter((panel) => panel?.label && panel?.body?.length)
+  : [
+      ...(home?.moreAboutMeHighlights?.length
+        ? [{label: "Highlights", body: home.moreAboutMeHighlights}]
+        : []),
+      ...(home?.moreAboutMeLifeMission?.length
+        ? [{label: "Life mission", body: home.moreAboutMeLifeMission}]
+        : []),
+    ];
+
+const defaultManualGroups = [
+  {
+    label: "Languages & frameworks",
+    items: [
+      "Flutter, React, React Native, Astro, Next.js, Tailwind",
+      "Node.js, Python, PHP",
+      "PostgreSQL, Supabase, Drizzle, Prisma",
+    ],
+  },
+  {
+    label: "Tools & platforms",
+    items: [
+      "Docker, VPS hosting, Traefik, Coolify",
+      "Cloudflare Workers and CI/CD pipelines",
+      "Workflow tooling across n8n, Zapier, and Make",
+    ],
+  },
+  {
+    label: "AI & automation",
+    items: [
+      "OpenAI APIs and custom assistants",
+      "Prompt engineering and workflow orchestration",
+      "Ops automation for sales, onboarding, support, and delivery",
+    ],
+  },
+  {
+    label: "Hardware & experimental",
+    items: [
+      "Raspberry Pi and Arduino builds",
+      "Real-time video processing and AI redaction pipelines",
+      "Products that need more than a browser and a database",
+    ],
+  },
+  {
+    label: "Builder rules",
+    items: [
+      "Ship fast, iterate faster",
+      "Build real things, not just ideas",
+      "Prefer simple systems over clever ones",
+    ],
+  },
+  {
+    label: "Interesting bits",
+    items: [
+      "Founder of Legocia, a privacy-first wearable memory product",
+      "Building an automation-heavy agency operating model",
+      "Comfortable moving between product, code, systems, and hardware",
+    ],
+  },
+];
+
+const manualGroups = (home?.manualGroups?.length ? home.manualGroups : defaultManualGroups).filter(
+  (group) => group?.label && group?.items?.length
+);
+
+const defaultConnectCards = [
+  {
+    label: "Platform",
+    title: "GitHub",
+    description: "github.com/YuriGuernsey",
+    href: "https://github.com/YuriGuernsey",
+  },
+  {
+    label: "Profile",
+    title: "LinkedIn",
+    description: "Add your LinkedIn URL in Studio",
+  },
+  {
+    label: "Asset",
+    title: "Resume",
+    description: "Upload your CV in Home settings to make this live",
+  },
+  {
+    label: "Updates",
+    title: "Build logs",
+    description: "Posts, experiments, and process notes",
+    href: "/post",
+  },
+];
+
+const connectCards = (home?.connectCards?.length ? home.connectCards : defaultConnectCards)
+  .filter((card) => card?.title)
+  .map((card) => ({
+    label: card.label || "Elsewhere",
+    title: card.title || "Link",
+    description: card.description || "",
+    href: card.href?.trim(),
+  }));
+
+const lifeMissionText =
+  toPlainText(home?.moreAboutMeLifeMission) ||
+  "Build tools that help people, automate the boring parts, and leave better systems behind so the next builder does not have to start from scratch.";
+
+const aboutDescription = aboutSection.description?.trim();
+
+function getJobSummary(job: (typeof featuredJobs)[number]) {
+  const summary =
+    toPlainText(job.body) ||
+    `${job.employmentType ? `${job.employmentType} role.` : "Role."} ${job.location ? `Based in ${job.location}.` : ""}`.trim();
+
+  return summary.length > 210 ? `${summary.slice(0, 207).trimEnd()}...` : summary;
 }
 ---
-<!-- @ts-ignore -->
-<Layout title={home.seoTitle}>
-<section id="top" class="hero">
-  <div class="hero-bg">
-<svg width="720" height="776" viewBox="0 0 720 776" fill="none" xmlns="http://www.w3.org/2000/svg">
-<line x1="-0.711587" y1="784.68" x2="719.288" y2="396.68" stroke="url(#paint0_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="746.68" x2="719.288" y2="358.68" stroke="url(#paint1_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="858.68" x2="719.288" y2="470.68" stroke="url(#paint2_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="820.68" x2="719.288" y2="432.68" stroke="url(#paint3_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="932.68" x2="719.288" y2="544.68" stroke="url(#paint4_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="894.68" x2="719.288" y2="506.68" stroke="url(#paint5_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="561.68" x2="719.288" y2="173.68" stroke="url(#paint6_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="523.68" x2="719.288" y2="135.68" stroke="url(#paint7_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="635.68" x2="719.288" y2="247.68" stroke="url(#paint8_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="597.68" x2="719.288" y2="209.68" stroke="url(#paint9_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="709.68" x2="719.288" y2="321.68" stroke="url(#paint10_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="671.68" x2="719.288" y2="283.68" stroke="url(#paint11_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="1008.68" x2="719.288" y2="620.68" stroke="url(#paint12_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="970.68" x2="719.288" y2="582.68" stroke="url(#paint13_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="1082.68" x2="719.288" y2="694.68" stroke="url(#paint14_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="1044.68" x2="719.288" y2="656.68" stroke="url(#paint15_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="1156.68" x2="719.288" y2="768.68" stroke="url(#paint16_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="1118.68" x2="719.288" y2="730.68" stroke="url(#paint17_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="337.68" x2="719.288" y2="-50.3205" stroke="url(#paint18_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="299.68" x2="719.288" y2="-88.3205" stroke="url(#paint19_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="411.68" x2="719.288" y2="23.6795" stroke="url(#paint20_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="373.68" x2="719.288" y2="-14.3205" stroke="url(#paint21_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="485.68" x2="719.288" y2="97.6795" stroke="url(#paint22_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="447.68" x2="719.288" y2="59.6795" stroke="url(#paint23_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="124.68" x2="719.288" y2="-263.32" stroke="url(#paint24_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="86.6795" x2="719.288" y2="-301.32" stroke="url(#paint25_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="48.6795" x2="719.288" y2="-339.32" stroke="url(#paint26_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="10.6795" x2="719.288" y2="-377.32" stroke="url(#paint27_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="198.68" x2="719.288" y2="-189.32" stroke="url(#paint28_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="160.68" x2="719.288" y2="-227.32" stroke="url(#paint29_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="272.68" x2="719.288" y2="-115.32" stroke="url(#paint30_linear_201_304)" stroke-width="3"/>
-<line x1="-0.711587" y1="234.68" x2="719.288" y2="-153.32" stroke="url(#paint31_linear_201_304)" stroke-width="3"/>
-<defs>
-<linearGradient id="paint0_linear_201_304" x1="0.237196" y1="786.44" x2="720.237" y2="398.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint1_linear_201_304" x1="0.237196" y1="748.44" x2="720.237" y2="360.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint2_linear_201_304" x1="0.237196" y1="860.44" x2="720.237" y2="472.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint3_linear_201_304" x1="0.237196" y1="822.44" x2="720.237" y2="434.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint4_linear_201_304" x1="0.237196" y1="934.44" x2="720.237" y2="546.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint5_linear_201_304" x1="0.237196" y1="896.44" x2="720.237" y2="508.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint6_linear_201_304" x1="0.237196" y1="563.44" x2="720.237" y2="175.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint7_linear_201_304" x1="0.237196" y1="525.44" x2="720.237" y2="137.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint8_linear_201_304" x1="0.237196" y1="637.44" x2="720.237" y2="249.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint9_linear_201_304" x1="0.237196" y1="599.44" x2="720.237" y2="211.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint10_linear_201_304" x1="0.237196" y1="711.44" x2="720.237" y2="323.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint11_linear_201_304" x1="0.237196" y1="673.44" x2="720.237" y2="285.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint12_linear_201_304" x1="0.237196" y1="1010.44" x2="720.237" y2="622.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint13_linear_201_304" x1="0.237196" y1="972.44" x2="720.237" y2="584.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint14_linear_201_304" x1="0.237196" y1="1084.44" x2="720.237" y2="696.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint15_linear_201_304" x1="0.237196" y1="1046.44" x2="720.237" y2="658.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint16_linear_201_304" x1="0.237196" y1="1158.44" x2="720.237" y2="770.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint17_linear_201_304" x1="0.237196" y1="1120.44" x2="720.237" y2="732.44" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint18_linear_201_304" x1="0.237196" y1="339.44" x2="720.237" y2="-48.5599" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint19_linear_201_304" x1="0.237196" y1="301.44" x2="720.237" y2="-86.5599" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint20_linear_201_304" x1="0.237196" y1="413.44" x2="720.237" y2="25.4401" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint21_linear_201_304" x1="0.237196" y1="375.44" x2="720.237" y2="-12.5599" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint22_linear_201_304" x1="0.237196" y1="487.44" x2="720.237" y2="99.4401" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint23_linear_201_304" x1="0.237196" y1="449.44" x2="720.237" y2="61.4401" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint24_linear_201_304" x1="0.237196" y1="126.44" x2="720.237" y2="-261.56" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint25_linear_201_304" x1="0.237196" y1="88.4402" x2="720.237" y2="-299.56" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint26_linear_201_304" x1="0.237196" y1="50.4402" x2="720.237" y2="-337.56" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint27_linear_201_304" x1="0.237196" y1="12.4402" x2="720.237" y2="-375.56" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint28_linear_201_304" x1="0.237196" y1="200.44" x2="720.237" y2="-187.56" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint29_linear_201_304" x1="0.237196" y1="162.44" x2="720.237" y2="-225.56" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint30_linear_201_304" x1="0.237196" y1="274.44" x2="720.237" y2="-113.56" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-<linearGradient id="paint31_linear_201_304" x1="0.237196" y1="236.44" x2="720.237" y2="-151.56" gradientUnits="userSpaceOnUse">
-<stop stop-color="#DAC400"/>
-<stop offset="1" stop-color="#151B22"/>
-</linearGradient>
-</defs>
-</svg>
 
+<Layout title={home?.seoTitle || "Portfolio 2026"} description={heroSummary}>
+  <div class="home-shell">
+    <header class="home-header">
+      <div class="home-header__inner">
+        <a class="home-brand" href="#top" aria-label="Yuri Guernsey portfolio home">
+          <strong>{brandPrefix} <span>{brandAccent}</span></strong>
+          <small>{brandMeta}</small>
+        </a>
 
-</div>
-{home.lookingForWork && (
-<div class="pillWork">
-<p>Open For Hire</p>
-Want to hire me?
-</div>
-)}
-<h1 class="heroTitle">{home.heroTitle}</h1>
-<h3 class="heroSubTitle">{home.heroSubtitle}</h3>
-  <p class="heroParagraph">
-    {home.herosubheading}
-  </p>
-  <div class="heroButtons">
-    <a href="#" class="primButton">Contact me</a>
-     <a href={cvURL+'?dl'} class="secButton">Download Resume</a>
-  </div>
-      </section>
+        <nav class="home-nav" aria-label="Primary">
+          <a href="#projects">Projects</a>
+          <a href="#work">Work</a>
+          <a href="#notes">Logs</a>
+          <a href="#about">About</a>
+          <a href="#connect">Connect</a>
+        </nav>
+      </div>
+    </header>
 
-<section class="p-4">
-   <h3 class="text-5xl font-bold mb-2 uppercase">Featured Work</h3>
-    <p class="mb-2 lowercase">A few projects I’ve built recently — solo, with a team, or just for fun.</p>
-     <ul class="space-y-4">
-        {projects.slice(0, 3).map((project) => (
-          // @ts-ignore
-          <li key={project.slug.current} >
-            <a class="flex justify-between mt-2" href={`/project/${project.slug.current}`} class="text-yellow-400 underline">
-              <div class="work">
-                <h3 class="yellow text-xl bold">{project.title}</h4>
-              <p class="text-sm bold">{project.excerpt}</p>
-                </div>
-                <div class="text-right uppercase">
-                     {/* @ts-ignore */}
-                <h4 class="text-xl bold">{project.tags}</h4>
-                  {/* @ts-ignore */}
-              <p class="text-sm bold">{project.description}</p>
-                </div>
+    <section class="home-hero" id="top">
+      <div class="home-hero__grid">
+        <div class="home-hero__main reveal">
+          {(home?.lookingForWork || home?.availableForFreelance) && <p class="home-status">Open for hire</p>}
+          <p class="home-eyebrow">{heroEyebrow}</p>
+          <h1>{heroTitle.replace("days", "")}{heroTitle.includes("days") ? <><em>days</em>{heroTitle.split("days")[1]}</> : null}</h1>
+          <p class="home-summary">{heroSummary}</p>
+
+          <div class="home-actions">
+            <a class:list={["home-btn", heroPrimaryAction.variant === "primary" && "home-btn--primary"]} href={heroPrimaryAction.href}>
+              {heroPrimaryAction.label}
             </a>
-          </li>
-        ))}
-        <a href="/project" class="secButton uppercase mt-8 block w-fit !py-2">View All Projects </a>
-      </ul>
-</section>
-
-<section class="p-4">
-   <h3 class="text-5xl font-bold mb-2 uppercase">Build Logs, Experiments & Rants</h3>
-    <p class="mb-2 lowercase">No fluff. Just the process, the problems, and the random sparks. Sometimes useful. Sometimes unhinged.</p>
-     <ul class="space-y-4">
-        {posts.slice(0, 3).map((post) => (
-            // @ts-ignore
-          <li key={post.slug.current} >
-            <a class="flex justify-between mt-2" href={`/post/${post.slug.current}`} class="text-yellow-400 underline">
-              <div class="work">
-                <h3 class="yellow text-xl bold">{post.title}</h4>
-              <p class="text-sm bold">{post.excerpt}</p>
-                </div>
-                <div class="text-right uppercase">
-{/* @ts-ignore */}
-                <h4 class="text-xl bold">{post.tags}</h4>
-              <p class="text-sm bold">{returnDateToString(post._createdAt)}</p>
-                </div>
+            <a class:list={["home-btn", heroSecondaryAction.variant === "primary" && "home-btn--primary"]} href={heroSecondaryAction.href}>
+              {heroSecondaryAction.label}
             </a>
-          </li>
-        ))}
-        <a href="/post" class="secButton uppercase mt-8 block w-fit !py-2">View All Posts </a>
-      </ul>
-</section>
-<section class="p-4 [&>ul]:list-disc [&>ul]:list-inside [&>ul]:pl-5 [&>ul]:mb-[20px] [&>ul>li>ul]:list-disc [&>ul>li>ul]:list-inside [&>ul>li>ul]:pl-5 [&>ul>li>ul]:mb-[20px]  [&>ul>li>ul>li>ul]:list-disc [&>ul>li>ul>li>ul]:list-inside [&>ul>li>ul>li>ul]:pl-5 [&>ul>li>ul>li>ul]:mb-[20px]">
-   <h3 class="text-5xl font-bold mb-2 uppercase">More about me</h3>
-   <PortableText value={home.moreAboutMe} />
-      <h4 class="text-2xl font-bold mb-2 uppercase yellow">Highlights</h4>
-       <PortableText value={home.moreAboutMeHighlights} />
-      <h4 class="text-2xl font-bold mb-2 uppercase yellow mt-2">Life Mission</h4>
-    <PortableText value={home.moreAboutMeLifeMission} />
-
-     <h4 class="text-2xl font-bold mb-2 uppercase yellow mt-2">Employment <span class="text-xs text-white">(Click on job to read more)</span></h4>
-    <ul class="">
-        {jobs.map((job) => (
-          <div class="job">
-               {/* @ts-ignore */}
-          <li key={job._id}  class="flex justify-between mt-2">
-              <div>
-                <h3 class=" text-xl bold">{job.title}</h4>
-              <p class="text-sm bold">{job.company}</p>
-                </div>
-                <div class="text-right uppercase">
-                <h4 class="text-xl bold">
-                  {returnShortDateToString(job.startDate)} - {job.currentlyEmployed ? 'Present' : returnShortDateToString(job.endDate)}
-                  </h4>
-              <p class="text-sm bold">{job.employmentType}</p>
-                </div>
-          </li>
-            <div class="expandable">
-               <PortableText value={job.body} />
-              
-                </div>
           </div>
+        </div>
+
+        <aside class="home-hero__side reveal">
+          <div class="home-block">
+            <span class="home-label">Currently</span>
+            <h2>{heroCurrentTitle}</h2>
+            <p>{heroCurrentDescription}</p>
+          </div>
+
+          <div class="home-block">
+            <span class="home-label">Focus</span>
+            <div class="home-pill-row">
+              {focusTags.map((tag) => (
+                <span class="home-pill">{tag}</span>
+              ))}
+            </div>
+          </div>
+
+          <div class="home-block">
+            <span class="home-label">Life mission</span>
+            {home?.moreAboutMeLifeMission?.length ? (
+              <div class="portable-copy portable-copy--compact">
+                <PortableText value={home.moreAboutMeLifeMission} />
+              </div>
+            ) : (
+              <p>{lifeMissionText}</p>
+            )}
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="home-section" id="projects">
+      <div class="home-section__head reveal">
+        <div>
+          <span class="home-overline">{projectsSection.overline}</span>
+          <h2>{projectsSection.title}</h2>
+        </div>
+        <p>{projectsSection.description}</p>
+      </div>
+
+      <div class="home-projects">
+        {featureCards.map((card) => (
+          <a class="home-project-card reveal" href={card.href}>
+            <div class="home-project-poster" data-mark={card.posterLabel}>
+              <div class="home-ribbon">
+                {(card.ribbonTags?.length ? card.ribbonTags : card.tags || ["Featured"]).slice(0, 3).map((tag) => (
+                  <span>{tag}</span>
+                ))}
+              </div>
+              <p class="home-poster-copy">{card.posterSummary || card.description}</p>
+            </div>
+            <div class="home-project-body">
+              <h3>{card.title}</h3>
+              <p>{card.description}</p>
+              {card.tags?.length ? (
+                <div class="home-tag-row">
+                  {card.tags.slice(0, 3).map((tag) => (
+                    <span>{tag}</span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </a>
         ))}
-        
-      </ul>
-</section>
+      </div>
+    </section>
 
+    <section class="home-section" id="work">
+      <div class="home-section__head reveal">
+        <div>
+          <span class="home-overline">{workSection.overline}</span>
+          <h2>{workSection.title}</h2>
+        </div>
+        <p>{workSection.description}</p>
+      </div>
 
-<section class="p-4">
- <h3 class="text-5xl font-bold mb-2 uppercase">Let's talk</h3>
-<p class="mb-2 lowercase">Got an idea? A project? A weird challenge? I’m all ears (and fast fingers).</p>
-  <div class="flex justify-center space-x-4 mt-6">
-    <a href="https://github.com/YuriGuernsey" target="_blank" class="yellow hover:underline">github</a>
-    <a href="mailto:aeveagg@pm.me" class="yellow hover:underline">email me</a>
-    <a href={cvURL+'?dl'} class="yellow hover:underline">resume</a>
-    <a href="https://www.linkedin.com/in/yuriguernsey" class="yellow hover:underline">linkedIn</a>
+        <div class="home-work-list">
+        {featuredJobs.length ? (
+          featuredJobs.map((job) => (
+            <article class="home-work-row reveal">
+              <div class="home-work-badge">{formatRange(job.startDate, job.endDate, job.currentlyEmployed)}</div>
+              <div class="home-work-main">
+                <h3>{job.title}</h3>
+                <div class="home-work-company">{job.company}</div>
+                <p>{getJobSummary(job)}</p>
+              </div>
+              <div class="home-work-stack">
+                {job.employmentType && <span>{normaliseTag(job.employmentType)}</span>}
+                {job.location && <span>{job.location}</span>}
+                <span>{job.currentlyEmployed ? "Current" : "Completed"}</span>
+              </div>
+            </article>
+          ))
+        ) : (
+          <p class="home-empty reveal">Add experience entries in Sanity to populate the work ledger.</p>
+        )}
+      </div>
+    </section>
+
+    <section class="home-section" id="notes">
+      <div class="home-section__head reveal">
+        <div>
+          <span class="home-overline">{notesSection.overline}</span>
+          <h2>{notesSection.title}</h2>
+        </div>
+        <p>{notesSection.description}</p>
+      </div>
+
+      <div class="home-notes">
+        {noteCards.map((card) => (
+          <a class="home-note-card reveal" href={card.href}>
+            <span class="home-card-meta">{card.meta}</span>
+            <h3>{card.title}</h3>
+            <p>{card.description}</p>
+            <span class="home-note-link">{card.linkLabel}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="home-section" id="about">
+      <div class="home-about">
+        <div class="home-about__intro reveal">
+          <span class="home-overline">{aboutSection.overline}</span>
+          <h2>{aboutSection.title}</h2>
+          {aboutDescription ? <p class="home-about-lead">{aboutDescription}</p> : null}
+          {home?.moreAboutMe?.length ? (
+            <div class="portable-copy">
+              <PortableText value={home.moreAboutMe} />
+            </div>
+          ) : (
+            <>
+              <p>
+                I am a Guernsey-based builder working across software, automation, and experimental hardware.
+                I prefer shipping over over-engineering, momentum over ceremony, and real-world testing over theory.
+              </p>
+              <p>
+                The work ranges from mobile apps and internal systems to AI workflows and edge-device experiments,
+                but the principle is consistent: build something useful, keep it understandable, and automate anything repetitive.
+              </p>
+            </>
+          )}
+        </div>
+
+        <div class="home-about__content reveal">
+          {aboutPanels.length ? (
+            <div class="home-about-panels">
+              {aboutPanels.map((panel) => (
+                <div class="home-about-panel">
+                  <span class="home-list-label">{panel.label}</span>
+                  {panel.body?.length ? (
+                    <div class="portable-copy portable-copy--compact">
+                      <PortableText value={panel.body} />
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          <div class="home-manual">
+            {manualGroups.map((group) => (
+              <div class="home-manual-group">
+                <span class="home-list-label">{group.label}</span>
+                <ul>
+                  {group.items?.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="home-section home-section--last" id="connect">
+      <div class="home-connect">
+        <div class="home-connect__copy reveal">
+          <span class="home-overline">{connectSection.overline}</span>
+          <h2>{connectSection.title}</h2>
+          <p>{connectSection.description}</p>
+
+          <div class="home-actions">
+            <a class:list={["home-btn", connectPrimaryAction.variant === "primary" && "home-btn--primary"]} href={connectPrimaryAction.href}>
+              {connectPrimaryAction.label}
+            </a>
+            <a class:list={["home-btn", connectSecondaryAction.variant === "primary" && "home-btn--primary"]} href={connectSecondaryAction.href}>
+              {connectSecondaryAction.label}
+            </a>
+          </div>
+        </div>
+
+        <div class="home-connect__cards">
+          {connectCards.map((card) => (
+            card.href ? (
+              <a class="home-connect-card reveal" href={card.href}>
+                <span class="home-card-meta">{card.label}</span>
+                <h3>{card.title}</h3>
+                <p>{card.description}</p>
+              </a>
+            ) : (
+              <article class="home-connect-card reveal">
+                <span class="home-card-meta">{card.label}</span>
+                <h3>{card.title}</h3>
+                <p>{card.description}</p>
+              </article>
+            )
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <footer class="home-footer">
+      <span>{brandPrefix} {brandAccent} / 2026</span>
+      <span>Built fast. Refined in production.</span>
+    </footer>
   </div>
-  <p class="text-sm text-gray-400 mt-6 text-center">PS: Built this site myself with Astro + Sanity.io + vibes. <a href="http://yuriguernsey.com/project/yuriguernsey-com-v2" class="yellow hover:underline">read about it here</a></p>
-</section> 
-<style>
-.hero {
-    text-align: center;
-    text-transform: uppercase;
-    font-weight: bold;
-    margin-top: 100px;
-    margin-bottom: 150px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    line-height: 40px;
-    max-height:550px;
 
-}
+  <script is:inline>
+    document.documentElement.classList.add("js");
 
-.heroTitle{
-  font-size: 110px;
-}
-.heroSubTitle{
-  font-size: 40px;
-  max-width: 600px;
-  margin-top: 40px;
-}
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealTargets = document.querySelectorAll(".reveal");
 
-.heroParagraph{
-  font-size: 18px;
-  max-width: 700px;
-  margin-top: 20px;
-  text-transform: lowercase;
-  line-height: 20px;
-}
+    if (!prefersReducedMotion) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.14,
+          rootMargin: "0px 0px -10% 0px",
+        }
+      );
 
-.heroButtons{
-  margin-top: 20px;
+      revealTargets.forEach((target) => observer.observe(target));
+    } else {
+      revealTargets.forEach((target) => target.classList.add("is-visible"));
+    }
+  </script>
+
+  <style>
+    .home-shell {
+      width: min(calc(100% - 40px), 1240px);
+      margin: 0 auto;
+      padding-bottom: 28px;
+    }
+
+    .home-header {
+      padding: 32px 0 12px;
+    }
+
+    .home-header__inner {
       display: flex;
-    gap: 20px;
-}
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+    }
 
-.primButton{
-  background: #DAC400;
-  padding: 0px 15px;
-  border-radius: 5px;
-  color: #151B22;
-  font-weight: bolder;
-  vertical-align: middle;
-  box-sizing: border-box;
-}
+    .home-brand {
+      text-decoration: none;
+      display: grid;
+      gap: 8px;
+      line-height: 1;
+    }
 
-.secButton{
-  border: solid 2px #DAC400;
-  padding: 0px 15px;
-  border-radius: 5px;
-  color: #DAC400;
-  font-weight: bolder;
-    vertical-align: middle;
-      box-sizing: border-box;
-}
+    .home-brand strong {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.06em;
+      text-transform: uppercase;
+    }
 
-.yellow{
-    color: #DAC400;
-}
+    .home-brand strong span {
+      color: var(--accent);
+    }
 
-.hero-bg {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%; /* or 100% if full background */
-  height: 550px;
-  z-index: -1;
-  overflow: hidden;
-}
-.job{
-  cursor: pointer;
-}
-.expandable {
-  max-height: 0rem;         /* collapsed height */
-  overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s ease;
-  cursor: pointer;
-  padding: 0;
-}
- .expandable.expanded {
-  max-height: 500px;        /* large enough to show full text */
-  padding: 1rem 0;
-}
+    .home-brand small,
+    .home-nav a,
+    .home-eyebrow,
+    .home-status,
+    .home-label,
+    .home-overline,
+    .home-card-meta,
+    .home-work-badge,
+    .home-list-label,
+    .home-pill,
+    .home-tag-row span,
+    .home-work-stack span,
+    .home-footer {
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
 
-.pillWork{
-      background: rgba(218,196,9,0.5);
-    display: flex;
-    margin-bottom: 50px;
-    justify-content: space-around;
-    border-radius: 30px;
-    padding: 0 20px 0 0;
-    gap: 10px;
-}
+    .home-brand small,
+    .home-eyebrow,
+    .home-label,
+    .home-overline,
+    .home-card-meta,
+    .home-list-label {
+      color: var(--muted);
+    }
 
-.pillWork > p{
-  background: #DAC400;
-    padding: 0 20px 0 20px;
-     border-radius: 30px;
-     color: #151B22;
-     font-weight: bold;
-}
+    .home-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px 18px;
+      padding-top: 6px;
+    }
 
-</style>
-<script is:inline>
-  const el = document.querySelector('.heroSubTitle'); // your element
-const text = el.textContent.trim();
+    .home-nav a {
+      color: rgba(244, 244, 239, 0.72);
+      text-decoration: none;
+      transition: color 150ms ease;
+    }
 
-// Split into words
-const words = text.split(' ');
+    .home-nav a:hover,
+    .home-nav a:focus-visible {
+      color: var(--accent);
+    }
 
-// Handle short text edge case
-if (words.length >= 1) {
-  const lastTwo = words.splice(-2).join(' ');
-  const rest = words.join(' ');
+    .home-hero {
+      padding: 34px 0 56px;
+    }
 
-  // Reconstruct with span wrapping the last 2 words
-  el.innerHTML = `${rest} <span style="color:#DAC400;">${lastTwo}</span>`;
-}
+    .home-hero__grid,
+    .home-about,
+    .home-connect {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+      gap: clamp(28px, 5vw, 64px);
+      align-items: start;
+    }
 
+    .home-status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 230, 0, 0.28);
+      background: rgba(255, 230, 0, 0.1);
+      color: var(--accent);
+      margin-bottom: 18px;
+    }
 
-document.querySelectorAll('.job').forEach(p => {
-  p.addEventListener('click', () => {
-    const target = p.querySelector('.expandable');
-    target.classList.toggle('expanded');
-  });
-});
+    .home-hero__main h1,
+    .home-section__head h2,
+    .home-block h2,
+    .home-project-body h3,
+    .home-work-main h3,
+    .home-note-card h3,
+    .home-about__intro h2,
+    .home-connect__copy h2,
+    .home-connect-card h3 {
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: -0.08em;
+      text-transform: uppercase;
+    }
 
-</script>
+    .home-hero__main h1 {
+      margin-top: 10px;
+      font-size: clamp(3.6rem, 8vw, 6.8rem);
+      line-height: 0.92;
+      max-width: 9ch;
+    }
+
+    .home-hero__main h1 em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .home-summary {
+      margin-top: 18px;
+      max-width: 38rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: rgba(244, 244, 239, 0.88);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .home-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .home-btn {
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+    }
+
+    .home-btn:hover,
+    .home-btn:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(255, 230, 0, 0.48);
+    }
+
+    .home-btn--primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #050505;
+    }
+
+    .home-hero__side {
+      display: grid;
+      gap: 18px;
+    }
+
+    .home-block,
+    .home-manual-group,
+    .home-about-panel {
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .home-block h2 {
+      margin-top: 8px;
+      font-size: clamp(1.25rem, 2.2vw, 1.8rem);
+      line-height: 1;
+    }
+
+    .home-block p,
+    .home-project-body p,
+    .home-work-main p,
+    .home-note-card p,
+    .home-connect__copy p,
+    .home-connect-card p,
+    .home-empty {
+      margin-top: 10px;
+      color: rgba(244, 244, 239, 0.76);
+      line-height: 1.62;
+    }
+
+    .home-pill-row,
+    .home-tag-row,
+    .home-work-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .home-pill,
+    .home-tag-row span,
+    .home-work-stack span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text);
+    }
+
+    .home-section {
+      padding: 34px 0 16px;
+    }
+
+    .home-section--last {
+      padding-bottom: 0;
+    }
+
+    .home-section__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .home-section__head h2 {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 0.94;
+    }
+
+    .home-section__head p {
+      margin: 10px 0 0;
+      max-width: 32rem;
+      color: rgba(244, 244, 239, 0.72);
+      line-height: 1.58;
+    }
+
+    .home-projects,
+    .home-notes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      padding-top: 22px;
+    }
+
+    .home-project-card,
+    .home-note-card,
+    .home-connect-card {
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      overflow: hidden;
+      text-decoration: none;
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+
+    .home-project-card:hover,
+    .home-note-card:hover,
+    .home-connect-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 230, 0, 0.44);
+    }
+
+    .home-project-poster {
+      position: relative;
+      min-height: 240px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line-soft);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 44%),
+        var(--panel-soft);
+      overflow: hidden;
+    }
+
+    .home-project-poster::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(135deg, rgba(255, 230, 0, 0.2) 0 2px, transparent 2px 18px);
+      opacity: 0.26;
+      pointer-events: none;
+    }
+
+    .home-project-poster::after {
+      content: attr(data-mark);
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: clamp(2.3rem, 4vw, 3.7rem);
+      line-height: 0.9;
+      font-weight: 700;
+      letter-spacing: -0.08em;
+      text-transform: uppercase;
+      color: rgba(244, 244, 239, 0.18);
+      pointer-events: none;
+    }
+
+    .home-ribbon {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .home-ribbon span {
+      min-height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: rgba(255, 230, 0, 0.14);
+      color: var(--accent);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .home-poster-copy {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      z-index: 1;
+      color: rgba(244, 244, 239, 0.7);
+      font-size: 0.78rem;
+      line-height: 1.55;
+      text-transform: uppercase;
+      max-width: 18rem;
+    }
+
+    .home-project-body,
+    .home-note-card,
+    .home-connect-card {
+      padding: 16px;
+    }
+
+    .home-project-body h3,
+    .home-note-card h3,
+    .home-connect-card h3 {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .home-work-list {
+      display: grid;
+      gap: 0;
+      padding-top: 12px;
+    }
+
+    .home-work-row {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr) 280px;
+      gap: 24px;
+      padding: 20px 0 22px;
+      border-bottom: 1px solid var(--line-soft);
+      align-items: start;
+    }
+
+    .home-work-badge {
+      color: var(--accent);
+      padding-top: 6px;
+    }
+
+    .home-work-main h3 {
+      font-size: 1.55rem;
+      line-height: 1;
+    }
+
+    .home-work-company {
+      margin-top: 8px;
+      color: var(--text);
+      font-size: 0.88rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .home-work-stack {
+      justify-content: flex-end;
+      padding-top: 6px;
+    }
+
+    .home-note-card {
+      display: grid;
+      align-content: start;
+      gap: 0;
+    }
+
+    .home-note-card h3 {
+      margin-top: 16px;
+      line-height: 1.08;
+    }
+
+    .home-note-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .home-about {
+      padding-top: 22px;
+    }
+
+    .home-about__intro h2,
+    .home-connect__copy h2 {
+      font-size: clamp(2rem, 4.4vw, 3.6rem);
+      line-height: 0.94;
+      max-width: 12ch;
+    }
+
+    .home-about-lead {
+      margin: 16px 0 20px;
+      max-width: 34rem;
+      color: rgba(244, 244, 239, 0.72);
+      line-height: 1.62;
+    }
+
+    .portable-copy,
+    .portable-copy :global(p),
+    .portable-copy :global(ul),
+    .portable-copy :global(ol) {
+      color: rgba(244, 244, 239, 0.78);
+      line-height: 1.72;
+    }
+
+    .portable-copy :global(p),
+    .portable-copy :global(ul),
+    .portable-copy :global(ol) {
+      margin: 0 0 0.95rem;
+    }
+
+    .portable-copy :global(ul),
+    .portable-copy :global(ol) {
+      padding-left: 1.1rem;
+    }
+
+    .portable-copy--compact :global(p),
+    .portable-copy--compact :global(ul),
+    .portable-copy--compact :global(ol) {
+      margin-bottom: 0.7rem;
+      line-height: 1.62;
+    }
+
+    .home-about__content {
+      display: grid;
+      gap: 22px;
+    }
+
+    .home-about-panels,
+    .home-manual {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .home-manual-group ul {
+      margin: 14px 0 0;
+      padding-left: 18px;
+      color: rgba(244, 244, 239, 0.76);
+      line-height: 1.62;
+    }
+
+    .home-manual-group li + li {
+      margin-top: 8px;
+    }
+
+    .home-connect {
+      padding-top: 22px;
+    }
+
+    .home-connect__cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .home-connect-card {
+      display: grid;
+      align-content: start;
+      min-height: 160px;
+    }
+
+    .home-footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 42px;
+      border-top: 1px solid var(--line);
+      margin-top: 42px;
+      color: rgba(244, 244, 239, 0.54);
+    }
+
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
+
+    .js .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition:
+        opacity 520ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .js .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1120px) {
+      .home-projects,
+      .home-notes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 980px) {
+      .home-hero__grid,
+      .home-about,
+      .home-connect {
+        grid-template-columns: 1fr;
+      }
+
+      .home-work-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .home-work-stack {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .home-shell {
+        width: min(calc(100% - 28px), 1240px);
+      }
+
+      .home-header {
+        padding: 24px 0 8px;
+      }
+
+      .home-header__inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .home-nav {
+        justify-content: flex-start;
+      }
+
+      .home-projects,
+      .home-notes,
+      .home-about-panels,
+      .home-manual,
+      .home-connect__cards {
+        grid-template-columns: 1fr;
+      }
+
+      .home-section__head {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .home-hero {
+        padding: 20px 0 40px;
+      }
+
+      .home-hero__main h1 {
+        font-size: clamp(2.8rem, 14vw, 4.4rem);
+      }
+
+      .home-summary {
+        margin-top: 14px;
+        font-size: 0.92rem;
+      }
+
+      .home-hero__side {
+        gap: 14px;
+      }
+
+      .home-block:last-child {
+        display: none;
+      }
+
+      .home-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .home-btn {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .home-project-card,
+      .home-note-card,
+      .home-connect-card,
+      .home-btn,
+      .reveal,
+      .js .reveal {
+        transition: none;
+        transform: none;
+      }
+    }
+  </style>
 </Layout>

@@ -1,32 +1,77 @@
 ---
-import type { InferGetStaticParamsType } from "astro";
-import { PortableText } from "astro-portabletext";
 import Layout from "../../layouts/Layout.astro";
-import { formatDate } from "../../utils";
-import { urlFor } from "../../utils/image";
-import { getProject, getProjects } from "../../utils/sanity";
+import { normaliseTag } from "../../utils";
+import { getProjects } from "../../utils/sanity";
 
-
-  const posts = await getProjects();
-
+const projects = await getProjects();
 ---
 
+<Layout title="Projects" description="Featured builds and experiments from Yuri Guernsey.">
+  <section class="content-page">
+    <div class="content-shell">
+      <a class="back-link" href="/">Back to home</a>
 
-<Layout title={'Projects'}>
-     <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <a href="/" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white mb-6">
-  ← Back to Home
-</a>
-    <h1 class="text-4xl font-bold dark:text-white mb-4">Projects</h1>
-  <p class="text-lg text-gray-600 dark:text-gray-300 mb-2">A few projects I’ve built recently — solo, with a team, or just for fun.</p>
-<ul class="list-disc ml-5 space-y-1">
-   {posts.map((post) => (
-    <li>
-      <a href={`/project/${post.slug.current}`} class="text-yellow-400 underline text-sm mb-6">
-        {post.title}
-      </a>
-    </li>
-  ))}
-    </ul>
-  </article>
+      <header class="content-header">
+        <span class="content-overline">Portfolio</span>
+        <h1 class="content-title">Projects</h1>
+        <p class="content-lede">A few builds, products, and experiments that made it past the idea stage and into the real world.</p>
+      </header>
+
+      {projects.length > 0 ? (
+        <div class="archive-list">
+          {projects.map((project) => (
+            <a class="content-entry archive-entry" href={`/project/${project.slug.current}`}>
+              <div>
+                <span class="entry-meta">Project</span>
+                <h2 class="entry-title">{project.title}</h2>
+                <p class="entry-copy">{project.excerpt || project.description || "Read the project."}</p>
+              </div>
+
+              {project.tags?.length ? (
+                <div class="entry-tags archive-side">
+                  {project.tags.slice(0, 3).map((tag) => (
+                    <span>{normaliseTag(tag)}</span>
+                  ))}
+                </div>
+              ) : null}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="archive-empty">No projects published yet.</p>
+      )}
+    </div>
+  </section>
+
+  <style>
+    .archive-list {
+      padding-top: 16px;
+    }
+
+    .archive-entry {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .archive-side {
+      justify-content: flex-end;
+    }
+
+    .archive-empty {
+      margin-top: 20px;
+      color: rgba(244, 244, 239, 0.72);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 720px) {
+      .archive-entry {
+        grid-template-columns: 1fr;
+      }
+
+      .archive-side {
+        justify-content: flex-start;
+      }
+    }
+  </style>
 </Layout>

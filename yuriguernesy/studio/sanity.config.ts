@@ -5,8 +5,8 @@ import { schemaTypes } from './src/schemaTypes'
 import { media } from 'sanity-plugin-media'
 import { iconify } from 'sanity-plugin-iconify'
 import { HomeIcon, CogIcon } from '@sanity/icons';
-// Environment variables for project configuration
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'your-projectID'
+
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'ek5zr1zv'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
 
 // Define allowed actions for singleton documents
