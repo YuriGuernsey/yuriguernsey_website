@@ -159,9 +159,9 @@ export function initStickerBoard(root: HTMLElement) {
   }
 
   /** Coasts a released sticker with friction. Resolves with its resting page coords, or null if it flew off. */
-  function fling(el: HTMLElement, x: number, y: number, vx: number, vy: number): Promise<{ x: number; y: number } | null> {
+  function fling(el: HTMLElement, x: number, y: number, vx: number, vy: number, canLeave: boolean): Promise<{ x: number; y: number } | null> {
     return new Promise((resolve) => {
-      if (reduceMotion() || Math.hypot(vx, vy) < 1.1) return resolve({ x, y });
+      if (reduceMotion() || Math.hypot(vx, vy) < 1.8) return resolve({ x, y });
       el.classList.add("is-flying");
       let px = x;
       let py = y;
@@ -178,7 +178,18 @@ export function initStickerBoard(root: HTMLElement) {
         el.style.top = `${py}px`;
         el.style.setProperty("--rot", `${spin}deg`);
         const off = px < -80 || px > docWidth() + 80 || py < window.scrollY - 160 || py > docHeight() + 80;
-        if (off) return resolve(null);
+        if (off && canLeave) return resolve(null);
+        if (!canLeave) {
+          // fresh stickers bounce off the edges instead of being lost
+          if (px < 40 || px > docWidth() - 40) {
+            px = Math.max(40, Math.min(docWidth() - 40, px));
+            fx *= -0.5;
+          }
+          if (py < 40 || py > docHeight() - 40) {
+            py = Math.max(40, Math.min(docHeight() - 40, py));
+            fy *= -0.5;
+          }
+        }
         if (Math.hypot(fx, fy) < 0.4) return resolve({ x: px, y: py });
         requestAnimationFrame(step);
       };
@@ -243,7 +254,7 @@ export function initStickerBoard(root: HTMLElement) {
         return;
       }
       const { vx, vy } = velocity();
-      const rest = await fling(ghost, up.pageX, up.pageY, vx, vy);
+      const rest = await fling(ghost, up.pageX, up.pageY, vx, vy, false);
       if (!rest) {
         ghost.remove();
         document.body.classList.remove("yg-dragging");
@@ -285,7 +296,7 @@ export function initStickerBoard(root: HTMLElement) {
     pickUp(el);
     drag(el, async (up) => {
       const { vx, vy } = velocity();
-      const rest = await fling(el, up.pageX, up.pageY, vx, vy);
+      const rest = await fling(el, up.pageX, up.pageY, vx, vy, true);
       if (!rest) {
         el.remove();
         els.delete(s.id);
