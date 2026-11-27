@@ -3,7 +3,7 @@ import { STICKERS, getSticker, stickerSvg, HIDDEN_IDS } from "./stickers";
 import { isUnlocked, onUnlock, toast, unlock, unlocked } from "./unlocks";
 
 const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const docWidth = () => document.documentElement.scrollWidth;
+const docWidth = () => document.documentElement.clientWidth;
 const docHeight = () => document.documentElement.scrollHeight;
 const normRot = (deg: number) => Math.round((((deg % 360) + 540) % 360) - 180);
 const rotOf = (el: HTMLElement, fallback: number) => normRot(Number.parseFloat(el.style.getPropertyValue("--rot")) || fallback);
@@ -155,7 +155,8 @@ export function initStickerBoard(root: HTMLElement) {
     const a = recent[0];
     const b = recent[recent.length - 1];
     const dt = Math.max(1, b.t - a.t);
-    return { vx: (b.x - a.x) / dt, vy: (b.y - a.y) / dt };
+    const cap = (v: number) => Math.max(-4, Math.min(4, v));
+    return { vx: cap((b.x - a.x) / dt), vy: cap((b.y - a.y) / dt) };
   }
 
   /** Coasts a released sticker with friction. Resolves with its resting page coords, or null if it flew off. */
@@ -253,14 +254,13 @@ export function initStickerBoard(root: HTMLElement) {
         document.body.classList.remove("yg-dragging");
         return;
       }
-      const { vx, vy } = velocity();
-      const rest = await fling(ghost, up.pageX, up.pageY, vx, vy, false);
-      if (!rest) {
-        ghost.remove();
-        document.body.classList.remove("yg-dragging");
-        unlock("yeet");
-        return;
-      }
+      // fresh stickers slap down exactly where they're dropped
+      const rest = {
+        x: Math.max(30, Math.min(docWidth() - 30, up.pageX)),
+        y: Math.max(30, Math.min(docHeight() - 30, up.pageY)),
+      };
+      ghost.style.left = `${rest.x}px`;
+      ghost.style.top = `${rest.y}px`;
       land(ghost);
       try {
         const s = await addSticker({ t: type, x: rest.x / docWidth(), y: Math.round(rest.y), r: rotOf(ghost, r) });
