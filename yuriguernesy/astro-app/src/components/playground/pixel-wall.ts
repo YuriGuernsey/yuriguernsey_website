@@ -42,10 +42,11 @@ export function initPixelWall() {
   function setStatus() {
     if (!wall) return;
     const filled = [...wall.grid].filter((c) => c !== "0").length;
+    const placed = `${filled} ${filled === 1 ? "pixel" : "pixels"} placed so far`;
     const shared = isRemote() ? "" : " (local mode: only you can see this wall)";
     status.textContent = placedToday()
-      ? `Thanks for leaving your mark. Next pixel in ${untilMidnightUtc()}. ${filled} pixels placed so far${shared}.`
-      : `Pick a colour and click a square. One pixel per visitor per day. ${filled} placed so far${shared}.`;
+      ? `Thanks for leaving your mark. Next pixel in ${untilMidnightUtc()}. ${placed}${shared}.`
+      : `Pick a colour and click a square. One pixel per visitor per day. ${placed}${shared}.`;
   }
 
   function draw() {
