@@ -1,5 +1,6 @@
 import { isRemote, loadWall, placePixel, placedToday, type PixelWall } from "./api";
 import { toast } from "./unlocks";
+import { printReceipt } from "./printer";
 
 export const PALETTE = ["#141414", "#f4f4ef", "#ffe600", "#ff4d2e", "#22c55e", "#0ea5e9", "#a855f7", "#f472b6", "#f97316"];
 const CELL = 12;
@@ -100,7 +101,7 @@ export function initPixelWall() {
       hover = null;
       draw();
       setStatus();
-      toast("Pixel placed. You're part of the wall now.");
+      printReceipt("Pixel wall", [[`1x pixel (${cell.x},${cell.y})`, "£0.00"]], "You're on the wall now");
     } catch (err) {
       const status = (err as { status?: number }).status;
       toast(status === 429 ? "You've already placed a pixel today." : "Couldn't place that pixel. Try again.");
