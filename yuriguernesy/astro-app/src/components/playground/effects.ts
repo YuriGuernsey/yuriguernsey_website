@@ -108,15 +108,32 @@ export function initTraces() {
 
 const HARDWARE = /hardware|embedded|pcb|firmware|raspberry|arduino|wearable|iot|electronic|sensor|esp32|bluetooth/i;
 
-export function initSolder() {
-  if (!window.matchMedia("(pointer: fine)").matches) return;
-  const targets = document.querySelectorAll<HTMLElement>(".home-project-card, .home-work-row, .home-pill, .home-manual-group, .home-note-card");
+export function initSolder(root: HTMLElement) {
+  const toggle = root.querySelector<HTMLInputElement>("[data-toggle='solder']");
+  if (!window.matchMedia("(pointer: fine)").matches) {
+    toggle?.closest("label")?.setAttribute("hidden", "");
+    return;
+  }
+  const targets = [
+    ...document.querySelectorAll<HTMLElement>(".home-project-card, .home-work-row, .home-pill, .home-manual-group, .home-note-card"),
+  ].filter((el) => HARDWARE.test(el.textContent || ""));
+
+  let on = read<boolean>("yg.solder", false);
+  const apply = () => targets.forEach((el) => el.classList.toggle("yg-solder", on));
+  if (toggle) {
+    toggle.checked = on;
+    toggle.addEventListener("change", () => {
+      on = toggle.checked;
+      write("yg.solder", on);
+      apply();
+    });
+  }
+  apply();
+
   let last = 0;
   targets.forEach((el) => {
-    if (!HARDWARE.test(el.textContent || "")) return;
-    el.classList.add("yg-solder");
-    if (reduceMotion()) return;
     el.addEventListener("pointermove", (e) => {
+      if (!on || reduceMotion()) return;
       const now = performance.now();
       if (now - last < 45) return;
       last = now;
@@ -156,15 +173,15 @@ function clickSound() {
   }
 }
 
-export function initLightSwitch() {
-  const nav = document.querySelector<HTMLElement>(".home-nav");
-  if (!nav || nav.querySelector(".yg-switch")) return;
+export function initLightSwitch(root: HTMLElement) {
+  const host = root.querySelector<HTMLElement>(".yg-settings__lights");
+  if (!host || host.querySelector(".yg-switch")) return;
   const html = document.documentElement;
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "yg-switch";
-  btn.innerHTML = `<span class="yg-switch__plate"><span class="yg-switch__lever"></span></span><span class="yg-switch__label">Lights</span>`;
-  nav.appendChild(btn);
+  btn.innerHTML = `<span class="yg-switch__plate"><span class="yg-switch__lever"></span></span><span class="yg-switch__label">Lights</span><span class="yg-switch__hint">Light / dark mode</span>`;
+  host.appendChild(btn);
 
   const sync = () => {
     const on = html.classList.contains("yg-light");
