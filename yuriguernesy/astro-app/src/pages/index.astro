@@ -1,6 +1,8 @@
 ---
 import { PortableText } from "astro-portabletext";
 import Layout from "../layouts/Layout.astro";
+import Playground from "../components/playground/Playground.astro";
+import PixelWall from "../components/playground/PixelWall.astro";
 import { urlforFile } from "../utils/image";
 import { formatRange, isExternalHref, normaliseHref, normaliseTag, toPlainText } from "../utils";
 import { getBlogPosts, getExperience, getHomepage, getProjects } from "../utils/sanity";
@@ -609,11 +611,15 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
       </div>
     </section>
 
+    <PixelWall />
+
     <footer class="home-footer">
       <span>{brandPrefix} {brandAccent} / 2026</span>
       <span>Built fast. Refined in production.</span>
     </footer>
   </div>
+
+  <Playground />
 
   <script is:inline>
     document.documentElement.classList.add("js");
