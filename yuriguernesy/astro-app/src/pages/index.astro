@@ -3,6 +3,10 @@ import { PortableText } from "astro-portabletext";
 import Layout from "../layouts/Layout.astro";
 import Playground from "../components/playground/Playground.astro";
 import PixelWall from "../components/playground/PixelWall.astro";
+import BootScreen from "../components/playground/BootScreen.astro";
+import Breadboard from "../components/playground/Breadboard.astro";
+import Cartridges from "../components/playground/Cartridges.astro";
+import VendingMachine from "../components/playground/VendingMachine.astro";
 import { urlforFile } from "../utils/image";
 import { formatRange, isExternalHref, normaliseHref, normaliseTag, toPlainText } from "../utils";
 import { getBlogPosts, getExperience, getHomepage, getProjects } from "../utils/sanity";
@@ -321,6 +325,18 @@ const connectCards = (home?.connectCards?.length ? home.connectCards : defaultCo
     href: normaliseHref(card.href),
   }));
 
+const carts = projects.slice(0, 8).map((project) => ({
+  title: project.title || "Project",
+  href: `/project/${project.slug.current}`,
+  excerpt: project.excerpt || project.description || "",
+  tags: project.tags || [],
+}));
+
+const cmsMail = [connectPrimaryAction.href, connectSecondaryAction.href, ...connectCards.map((card) => card.href || "")].find((href) =>
+  href?.startsWith("mailto:")
+);
+const hireEmail = cmsMail ? cmsMail.replace(/^mailto:/, "").split("?")[0] : "yurialvesguernsey@outlook.com";
+
 const lifeMissionText =
   toPlainText(home?.moreAboutMeLifeMission) ||
   "Build tools that help people, automate the boring parts, and leave better systems behind so the next builder does not have to start from scratch.";
@@ -346,6 +362,8 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
 ---
 
 <Layout title={home?.seoTitle || "Portfolio 2026"} description={heroSummary}>
+  <BootScreen />
+
   <section
     class="home-top-stage"
     id="top"
@@ -372,7 +390,9 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
           <a href="#projects">Projects</a>
           <a href="#work">Work</a>
           <a href="#notes">Logs</a>
+          <a href="#skills">Skills</a>
           <a href="#about">About</a>
+          <a href="#hire">Hire</a>
           <a href="#connect">Connect</a>
         </nav>
       </div>
@@ -465,6 +485,19 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
       </div>
     </section>
 
+    {carts.length ? (
+      <section class="home-section" id="cartridges">
+        <div class="home-section__head reveal">
+          <div>
+            <span class="home-overline">Press start</span>
+            <h2>Pick a cartridge</h2>
+          </div>
+          <p>Every project is a game cart. Drag one into the console (or tap it) to boot it up.</p>
+        </div>
+        <Cartridges carts={carts} />
+      </section>
+    ) : null}
+
     <section class="home-section" id="work">
       <div class="home-section__head reveal">
         <div>
@@ -516,6 +549,17 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
           </a>
         ))}
       </div>
+    </section>
+
+    <section class="home-section" id="skills">
+      <div class="home-section__head reveal">
+        <div>
+          <span class="home-overline">Bill of materials</span>
+          <h2>Skills board</h2>
+        </div>
+        <p>Everything I build with, plugged into one breadboard. Hover a component to light it up and see where I've used it.</p>
+      </div>
+      <Breadboard />
     </section>
 
     <section class="home-section" id="about">
@@ -572,6 +616,17 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
           </div>
         </div>
       </div>
+    </section>
+
+    <section class="home-section" id="hire">
+      <div class="home-section__head reveal">
+        <div>
+          <span class="home-overline">Work with me</span>
+          <h2>Hire-o-matic</h2>
+        </div>
+        <p>Insert a coin, pick what you need, and grab the capsule. It comes with an email ready to send.</p>
+      </div>
+      <VendingMachine email={hireEmail} />
     </section>
 
     <section class="home-section home-section--last" id="connect">

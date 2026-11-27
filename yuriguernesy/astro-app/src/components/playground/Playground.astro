@@ -31,6 +31,8 @@ const solderCursor = `url("data:image/svg+xml,${encodeURIComponent(
       <label><input type="checkbox" data-toggle="stickers" checked /> Show stickers on page</label>
       <label><input type="checkbox" data-toggle="buddy" /> BuffBuddy (pixel gym buddy)</label>
       <label><input type="checkbox" data-toggle="solder" /> Soldering-iron cursor on hardware work</label>
+      <label><input type="checkbox" data-toggle="scope" checked /> Oscilloscope scroll bar</label>
+      <button type="button" class="yg-sheet__reboot">Replay boot sequence</button>
     </div>
 
     <div class="yg-sheet__section">
@@ -60,6 +62,7 @@ const solderCursor = `url("data:image/svg+xml,${encodeURIComponent(
   import { initBuddy } from "./buddy";
   import { initEasterEggs, initHeroBuild, initLightSwitch, initSolder, initTraces } from "./effects";
   import { initPixelWall } from "./pixel-wall";
+  import { initScope } from "./scope";
 
   function boot() {
     const root = document.querySelector<HTMLElement>(".yg-root");
@@ -75,6 +78,13 @@ const solderCursor = `url("data:image/svg+xml,${encodeURIComponent(
       () => initSolder(root),
       initEasterEggs,
       initPixelWall,
+      () => initScope(root),
+      () =>
+        root.querySelector(".yg-sheet__reboot")?.addEventListener("click", () => {
+          const boot = (window as unknown as { __ygBoot?: () => void }).__ygBoot;
+          root.querySelector<HTMLElement>(".yg-sheet")!.hidden = true;
+          boot?.();
+        }),
     ];
     // One broken toy should never take the rest of the page down with it.
     for (const step of steps) {
@@ -595,6 +605,108 @@ const solderCursor = `url("data:image/svg+xml,${encodeURIComponent(
   }
   .yg-buddy__bubble[hidden] {
     display: none;
+  }
+
+  .yg-sheet__reboot {
+    justify-self: start;
+    margin-top: 4px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .yg-sheet__reboot:hover {
+    border-color: var(--accent);
+  }
+
+  /* ---------- guestbook printer ---------- */
+  .yg-receipt {
+    position: fixed;
+    right: 26px;
+    bottom: 66px;
+    z-index: 59;
+    width: 236px;
+    padding: 14px 12px 22px;
+    background: #fbfaf5;
+    color: #1a1a1a;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+    transform-origin: bottom center;
+    cursor: pointer;
+    animation: yg-feed 240ms ease-out;
+    -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 12px 100%;
+    mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 12px 100%;
+  }
+  .yg-receipt pre {
+    margin: 0;
+    font: 600 11px/1.45 ui-monospace, Menlo, Consolas, monospace;
+    white-space: pre;
+  }
+  .yg-receipt.is-torn {
+    animation: yg-tear 520ms ease-in forwards;
+  }
+  @keyframes yg-feed {
+    from {
+      clip-path: inset(100% 0 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes yg-tear {
+    20% {
+      transform: rotate(-4deg);
+    }
+    to {
+      transform: translate(-40px, 120px) rotate(-18deg);
+      opacity: 0;
+    }
+  }
+  .yg-fab.is-printing {
+    animation: yg-buzz 90ms linear infinite;
+  }
+  @keyframes yg-buzz {
+    50% {
+      transform: translateX(1px);
+    }
+  }
+
+  /* ---------- oscilloscope ---------- */
+  .yg-scope {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    width: 24px;
+    background: rgba(2, 8, 4, 0.72);
+    border-left: 1px solid rgba(57, 255, 136, 0.25);
+    pointer-events: none;
+  }
+  .yg-scope[hidden] {
+    display: none;
+  }
+  .yg-scope canvas {
+    display: block;
+  }
+  .yg-scope__label {
+    position: absolute;
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%) rotate(90deg);
+    transform-origin: center;
+    color: rgba(57, 255, 136, 0.7);
+    font: 600 9px/1 ui-monospace, Menlo, monospace;
+    white-space: nowrap;
+    margin-top: 28px;
+  }
+  @media (max-width: 1100px) {
+    .yg-scope {
+      display: none;
+    }
   }
 
   @media print {

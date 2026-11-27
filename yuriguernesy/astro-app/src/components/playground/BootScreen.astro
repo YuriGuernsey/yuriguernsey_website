@@ -1,0 +1,164 @@
+---
+// BIOS-style boot screen shown once on a visitor's first visit (replayable from Settings).
+// Inline so it covers the page before anything else paints. Any key or click skips it.
+---
+
+<div class="yg-boot" hidden aria-hidden="true">
+  <div class="yg-boot__screen">
+    <div class="yg-boot__top">
+      <span>YURI-OS BIOS v26.11</span>
+      <span>(C) Legocia Ltd</span>
+    </div>
+    <pre class="yg-boot__log"></pre>
+    <div class="yg-boot__bar"><span></span></div>
+    <p class="yg-boot__skip">Press any key to skip</p>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var el = document.querySelector(".yg-boot");
+    if (!el) return;
+    var LINES = [
+      ["Memory test: 640K ... ought to be enough", "OK"],
+      ["CPU: caffeine-cooled @ 4.2 GHz", "OK"],
+      ["Detecting soldering iron", "HOT"],
+      ["Detecting BuffBuddy", "STRETCHING"],
+      ["Mounting /dev/projects", "OK"],
+      ["Loading stickers", "OK"],
+      ["Checking ship-on-friday guard", "DISABLED"],
+      ["Starting portfolio", "OK"],
+    ];
+    var timers = [];
+    var running = false;
+
+    function finish() {
+      if (!running) return;
+      running = false;
+      timers.forEach(clearTimeout);
+      el.classList.add("is-done");
+      setTimeout(function () {
+        el.hidden = true;
+        el.classList.remove("is-done");
+        document.documentElement.classList.remove("yg-booting");
+      }, 380);
+      window.removeEventListener("keydown", finish);
+      el.removeEventListener("pointerdown", finish);
+    }
+
+    function boot() {
+      var log = el.querySelector(".yg-boot__log");
+      var bar = el.querySelector(".yg-boot__bar span");
+      log.textContent = "";
+      bar.style.width = "0%";
+      el.hidden = false;
+      running = true;
+      document.documentElement.classList.add("yg-booting");
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var step = reduce ? 40 : 190;
+      LINES.forEach(function (line, i) {
+        timers.push(
+          setTimeout(function () {
+            var dots = ".".repeat(Math.max(2, 44 - line[0].length));
+            log.textContent += line[0] + " " + dots + " [" + line[1] + "]\n";
+            bar.style.width = Math.round(((i + 1) / LINES.length) * 100) + "%";
+          }, 250 + i * step)
+        );
+      });
+      timers.push(setTimeout(finish, 250 + LINES.length * step + (reduce ? 200 : 650)));
+      window.addEventListener("keydown", finish);
+      el.addEventListener("pointerdown", finish);
+    }
+
+    window.__ygBoot = boot;
+    var seen = false;
+    try {
+      seen = localStorage.getItem("yg.booted") === "1";
+      localStorage.setItem("yg.booted", "1");
+    } catch (e) {
+      seen = true;
+    }
+    var bot = /bot|crawl|spider|lighthouse|preview/i.test(navigator.userAgent);
+    if (!seen && !bot) boot();
+  })();
+</script>
+
+<style is:global>
+  .yg-boot {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: #020202;
+    color: #c8ffd4;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    transition: opacity 360ms ease, transform 360ms ease;
+  }
+  .yg-boot[hidden] {
+    display: none;
+  }
+  .yg-boot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px);
+    pointer-events: none;
+  }
+  .yg-boot.is-done {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+  .yg-boot__screen {
+    width: min(720px, 100%);
+  }
+  .yg-boot__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid rgba(200, 255, 212, 0.25);
+    color: #ffe600;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+  }
+  .yg-boot__log {
+    min-height: 15em;
+    margin: 0;
+    font: inherit;
+    font-size: clamp(0.7rem, 2.6vw, 0.92rem);
+    line-height: 1.75;
+    white-space: pre-wrap;
+    text-shadow: 0 0 6px rgba(57, 255, 136, 0.45);
+  }
+  .yg-boot__bar {
+    height: 10px;
+    margin-top: 16px;
+    border: 1px solid rgba(200, 255, 212, 0.4);
+    padding: 1px;
+  }
+  .yg-boot__bar span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: #39ff88;
+    box-shadow: 0 0 10px #39ff88;
+    transition: width 160ms linear;
+  }
+  .yg-boot__skip {
+    margin: 14px 0 0;
+    color: rgba(200, 255, 212, 0.5);
+    font-size: 0.78rem;
+    animation: yg-blink 1s steps(2) infinite;
+  }
+  @keyframes yg-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  html.yg-booting body {
+    overflow: hidden;
+  }
+</style>

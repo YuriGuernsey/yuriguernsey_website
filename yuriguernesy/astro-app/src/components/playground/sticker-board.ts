@@ -1,6 +1,7 @@
 import { addSticker, isRemote, loadStickers, moveSticker, read, removeSticker, write, type PlacedSticker } from "./api";
 import { STICKERS, getSticker, stickerSvg, HIDDEN_IDS } from "./stickers";
 import { isUnlocked, onUnlock, toast, unlock, unlocked } from "./unlocks";
+import { printReceipt } from "./printer";
 
 const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const docWidth = () => document.documentElement.clientWidth;
@@ -267,6 +268,7 @@ export function initStickerBoard(root: HTMLElement) {
         ghost.remove();
         placed.push(s);
         renderOne(s);
+        printReceipt("Sticker placed", [[`1x ${def.label}`, "£0.00"]], isRemote() ? "Everyone can see it now" : "Thanks for visiting");
       } catch (err) {
         ghost.remove();
         const status = (err as { status?: number }).status;
@@ -282,7 +284,7 @@ export function initStickerBoard(root: HTMLElement) {
       renderOne(s);
       const el = els.get(s.id);
       if (el) land(el);
-      toast("Sticker placed.");
+      printReceipt("Sticker placed", [[`1x ${getSticker(type)?.label ?? type}`, "£0.00"]]);
     } catch {
       toast("That sticker didn't stick. Try again.");
     }

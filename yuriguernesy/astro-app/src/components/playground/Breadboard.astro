@@ -1,0 +1,342 @@
+---
+import { SKILLS } from "./skills";
+---
+
+<div class="bb">
+  <div class="bb-lcd yg-noinvert" aria-live="polite">
+    <div class="bb-lcd__screen">
+      <span class="bb-lcd__l1">SKILLS BOARD v1</span>
+      <span class="bb-lcd__l2">HOVER A COMPONENT_</span>
+    </div>
+    <div class="bb-lcd__pins" aria-hidden="true"></div>
+  </div>
+
+  <div class="bb-board yg-noinvert">
+    <div class="bb-rail bb-rail--top" aria-hidden="true"><i></i><i></i></div>
+    <ul class="bb-parts" role="list">
+      {
+        SKILLS.map((s, i) => (
+          <li>
+            <button
+              type="button"
+              class={`bb-part bb-part--${s.kind}`}
+              style={`--led:${s.led};--i:${i}`}
+              data-name={s.name}
+              data-group={s.group}
+              data-used={s.used}
+              aria-label={`${s.name}: ${s.used}`}
+            >
+              <span class="bb-led" aria-hidden="true" />
+              <span class="bb-chip" aria-hidden="true">
+                {s.short}
+              </span>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="bb-rail bb-rail--bottom" aria-hidden="true"><i></i><i></i></div>
+  </div>
+</div>
+
+<script>
+  function initBreadboard() {
+    const root = document.querySelector<HTMLElement>(".bb");
+    if (!root || root.dataset.ready) return;
+    root.dataset.ready = "1";
+    const l1 = root.querySelector<HTMLElement>(".bb-lcd__l1")!;
+    const l2 = root.querySelector<HTMLElement>(".bb-lcd__l2")!;
+    const parts = [...root.querySelectorAll<HTMLButtonElement>(".bb-part")];
+    let marquee = 0;
+
+    const show = (p: HTMLButtonElement) => {
+      parts.forEach((x) => x.classList.toggle("is-lit", x === p));
+      l1.textContent = `${p.dataset.group?.toUpperCase()}: ${p.dataset.name?.toUpperCase()}`;
+      const text = `${p.dataset.used}  ·  `;
+      window.clearInterval(marquee);
+      let i = 0;
+      l2.textContent = text;
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        marquee = window.setInterval(() => {
+          i = (i + 1) % text.length;
+          l2.textContent = text.slice(i) + text.slice(0, i);
+        }, 140);
+      }
+    };
+
+    parts.forEach((p) => {
+      p.addEventListener("pointerenter", () => show(p));
+      p.addEventListener("focus", () => show(p));
+      p.addEventListener("click", () => show(p));
+    });
+
+    // components "push in" when the board scrolls into view
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        root.classList.add("is-in");
+        io.disconnect();
+      }
+    }, { threshold: 0.2 });
+    io.observe(root);
+  }
+  document.addEventListener("astro:page-load", initBreadboard);
+  initBreadboard();
+</script>
+
+<style>
+  .bb {
+    display: grid;
+    gap: 18px;
+  }
+
+  /* ---- 16x2 LCD ---- */
+  .bb-lcd {
+    justify-self: start;
+    width: min(560px, 100%);
+    padding: 14px;
+    border-radius: 10px;
+    background: #0d4d2a;
+    box-shadow: inset 0 0 0 2px #0a3b20, 0 10px 24px rgba(0, 0, 0, 0.4);
+  }
+  .bb-lcd__screen {
+    display: grid;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    background: #a9c94a;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35);
+    color: #1f2a0c;
+    font: 700 clamp(0.72rem, 2.2vw, 0.95rem) / 1.25 ui-monospace, Menlo, Consolas, monospace;
+    letter-spacing: 0.06em;
+    overflow: hidden;
+  }
+  .bb-lcd__screen span {
+    display: block;
+    white-space: pre;
+    overflow: hidden;
+  }
+
+  /* ---- the board ---- */
+  .bb-board {
+    position: relative;
+    padding: 34px 22px;
+    border-radius: 14px;
+    background-color: #efe9da;
+    background-image: radial-gradient(circle at 50% 50%, #b9b1a0 0 1.6px, transparent 2.2px);
+    background-size: 14px 14px;
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.08),
+      0 18px 40px rgba(0, 0, 0, 0.45);
+  }
+  .bb-board::after {
+    content: "";
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    top: 50%;
+    height: 10px;
+    margin-top: -5px;
+    border-radius: 3px;
+    background: #ddd5c3;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+  }
+  .bb-rail {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    display: grid;
+    gap: 8px;
+  }
+  .bb-rail i {
+    display: block;
+    height: 2px;
+    border-radius: 2px;
+  }
+  .bb-rail i:first-child {
+    background: #d62828;
+  }
+  .bb-rail i:last-child {
+    background: #1d4ed8;
+  }
+  .bb-rail--top {
+    top: 10px;
+  }
+  .bb-rail--bottom {
+    bottom: 10px;
+  }
+
+  .bb-parts {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+    gap: 22px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bb-part {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 76px;
+    padding: 12px 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transform: translateY(-14px);
+    opacity: 0;
+    transition:
+      transform 360ms cubic-bezier(0.2, 1.5, 0.4, 1),
+      opacity 240ms ease;
+    transition-delay: calc(var(--i) * 45ms);
+  }
+  .bb.is-in .bb-part {
+    transform: none;
+    opacity: 1;
+  }
+  :global(html:not(.js)) .bb-part {
+    transform: none;
+    opacity: 1;
+  }
+
+  .bb-chip {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    max-width: 120px;
+    height: 44px;
+    padding: 0 8px;
+    color: #f4f4ef;
+    font: 700 0.7rem/1 ui-monospace, Menlo, Consolas, monospace;
+    letter-spacing: 0.08em;
+    text-align: center;
+    transition: transform 140ms ease;
+  }
+
+  /* DIP chip: black body, notch, silver legs top and bottom */
+  .bb-part--ic .bb-chip {
+    background: #151515;
+    border-radius: 3px;
+    box-shadow: 0 3px 0 #000, 0 6px 10px rgba(0, 0, 0, 0.3);
+  }
+  .bb-part--ic .bb-chip::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    width: 8px;
+    height: 12px;
+    margin-top: -6px;
+    border-radius: 0 8px 8px 0;
+    background: #2a2a2a;
+  }
+  .bb-part--ic .bb-chip::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    top: -7px;
+    bottom: -7px;
+    z-index: -1;
+    background:
+      repeating-linear-gradient(90deg, #b8b8b8 0 4px, transparent 4px 12px) top / 100% 7px no-repeat,
+      repeating-linear-gradient(90deg, #b8b8b8 0 4px, transparent 4px 12px) bottom / 100% 7px no-repeat;
+  }
+
+  /* breakout module: blue PCB with header pins */
+  .bb-part--module .bb-chip {
+    background: #1e3a8a;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 2px #2b4fb5, 0 3px 0 #10215a, 0 6px 10px rgba(0, 0, 0, 0.3);
+  }
+  .bb-part--module .bb-chip::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 5px;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, #e2c35a 0 4px, transparent 4px 9px);
+  }
+
+  /* hardware: green board with mounting holes */
+  .bb-part--hw .bb-chip {
+    background: #13612f;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 2px #1d8443, 0 3px 0 #0b3d1d, 0 6px 10px rgba(0, 0, 0, 0.3);
+  }
+  .bb-part--hw .bb-chip::before,
+  .bb-part--hw .bb-chip::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #efe9da;
+    box-shadow: 0 0 0 2px #d6b44a;
+  }
+  .bb-part--hw .bb-chip::before {
+    left: 6px;
+  }
+  .bb-part--hw .bb-chip::after {
+    right: 6px;
+  }
+
+  /* status LED */
+  .bb-led {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    z-index: 2;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--led) 30%, #3a3a3a);
+    box-shadow: inset 0 -2px 2px rgba(0, 0, 0, 0.35);
+    transition:
+      background 160ms ease,
+      box-shadow 160ms ease;
+  }
+  .bb-led::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 2px;
+    height: 10px;
+    margin-left: -1px;
+    background: #9a9a9a;
+  }
+  .bb-part:hover .bb-chip,
+  .bb-part:focus-visible .bb-chip,
+  .bb-part.is-lit .bb-chip {
+    transform: translateY(-2px);
+  }
+  .bb-part.is-lit .bb-led,
+  .bb-part:hover .bb-led,
+  .bb-part:focus-visible .bb-led {
+    background: var(--led);
+    box-shadow:
+      0 0 8px 2px var(--led),
+      0 0 20px 4px color-mix(in srgb, var(--led) 50%, transparent);
+  }
+  .bb-part:focus-visible {
+    outline: 2px dashed #1a1a1a;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bb-part {
+      transform: none;
+      opacity: 1;
+      transition: none;
+    }
+  }
+</style>

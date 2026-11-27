@@ -1,5 +1,6 @@
 import { read, write } from "./api";
 import { HIDDEN_IDS, getSticker } from "./stickers";
+import { printReceipt } from "./printer";
 
 const KEY = "yg.unlocked";
 const listeners = new Set<() => void>();
@@ -35,7 +36,8 @@ export function unlock(id: string) {
   list.push(id);
   write(KEY, list);
   const def = getSticker(id);
-  toast(`Hidden sticker found: ${def?.label ?? id}! Check your sticker sheet.`, "gold");
+  toast(`Hidden sticker found: ${def?.label ?? id}! It's in Settings now.`, "gold");
+  printReceipt("Hidden item found", [[`${def?.label ?? id} sticker`, "FREE"]], "Find them all");
 
   if (id !== "completionist" && HIDDEN_IDS.every((h) => list.includes(h))) {
     window.setTimeout(() => unlock("completionist"), 900);
