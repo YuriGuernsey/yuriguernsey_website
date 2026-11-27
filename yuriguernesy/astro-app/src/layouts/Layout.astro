@@ -89,6 +89,11 @@ const faviconType = getFileType(faviconUrl);
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
 
     <title>{pageTitle}</title>
+    <script is:inline>
+      try {
+        if (localStorage.getItem("yg.lights") === '"on"') document.documentElement.classList.add("yg-light");
+      } catch (e) {}
+    </script>
 
     <ViewTransitions />
 
@@ -109,6 +114,17 @@ const faviconType = getFileType(faviconUrl);
 
       * {
         box-sizing: border-box;
+      }
+
+      /* Light mode, toggled by the light switch on the homepage */
+      html.yg-light {
+        filter: invert(1) hue-rotate(180deg);
+      }
+
+      html.yg-light img,
+      html.yg-light video,
+      html.yg-light .yg-noinvert {
+        filter: invert(1) hue-rotate(180deg);
       }
 
       html {

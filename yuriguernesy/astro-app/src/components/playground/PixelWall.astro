@@ -1,0 +1,84 @@
+---
+// One-pixel-per-visitor-per-day wall. Logic lives in pixel-wall.ts (started by Playground.astro).
+---
+
+<section class="yg-wall" aria-labelledby="yg-wall-title">
+  <div class="yg-wall__head">
+    <div>
+      <span class="home-overline">Guestbook, but pixels</span>
+      <h2 id="yg-wall-title">Leave a mark</h2>
+    </div>
+    <div class="yg-wall__palette" role="group" aria-label="Pixel colour"></div>
+  </div>
+  <div class="yg-wall__frame yg-noinvert">
+    <canvas width="768" height="240" aria-label="Shared pixel wall. Click a square to place your pixel for today."></canvas>
+  </div>
+  <p class="yg-wall__status" aria-live="polite">Loading the wall...</p>
+</section>
+
+<style>
+  .yg-wall {
+    padding: 56px 0 8px;
+    border-top: 1px solid var(--line);
+    margin-top: 24px;
+  }
+
+  .yg-wall__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  .yg-wall__head h2 {
+    margin: 8px 0 0;
+    font-size: clamp(2rem, 4.4vw, 3.4rem);
+    line-height: 0.94;
+    letter-spacing: -0.07em;
+    text-transform: uppercase;
+  }
+
+  .yg-wall__palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .yg-wall__palette :global(button) {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    cursor: pointer;
+    transition: transform 120ms ease;
+  }
+
+  .yg-wall__palette :global(button[aria-pressed="true"]) {
+    border-color: #fff;
+    transform: translateY(-3px);
+  }
+
+  .yg-wall__frame {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 8px;
+    background: #050505;
+  }
+
+  .yg-wall__frame canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+    cursor: crosshair;
+    touch-action: manipulation;
+  }
+
+  .yg-wall__status {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+</style>
