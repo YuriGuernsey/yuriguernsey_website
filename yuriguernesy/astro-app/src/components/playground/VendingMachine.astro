@@ -72,7 +72,7 @@ const ITEMS = [
     </div>
   </div>
 
-  <div class="vm-order" hidden role="dialog" aria-label="Your order">
+  <dialog class="vm-order" aria-label="Your order">
     <div class="vm-order__card">
       <button type="button" class="vm-order__close" aria-label="Close">×</button>
       <span class="vm-order__eyebrow">Capsule opened</span>
@@ -84,7 +84,7 @@ const ITEMS = [
         <button type="button" class="vm-order__copy">Copy message</button>
       </div>
     </div>
-  </div>
+  </dialog>
 </div>
 
 <script>
@@ -142,12 +142,15 @@ const ITEMS = [
     const display = root.querySelector<HTMLElement>(".vm-display")!;
     const coinBtn = root.querySelector<HTMLButtonElement>(".vm-coin-slot")!;
     const tray = root.querySelector<HTMLButtonElement>(".vm-tray")!;
-    const order = root.querySelector<HTMLElement>(".vm-order")!;
+    const order = root.querySelector<HTMLDialogElement>(".vm-order")!;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let credit = 0;
     let busy = false;
     let pending: HTMLButtonElement | null = null;
     let flashTimer = 0;
+    const idle = () => (pending ? "TAKE YOUR ITEM" : credit ? "CREDIT 1 · SELECT" : "INSERT COIN");
+    // delayed messages re-check state when they fire, so they never show something stale
+    const sayLater = (ms: number) => window.setTimeout(() => !busy && say(idle()), ms);
 
     const say = (text: string, flash = false) => {
       display.textContent = text;
@@ -156,7 +159,7 @@ const ITEMS = [
       if (flash) {
         flashTimer = window.setTimeout(() => {
           display.classList.remove("is-flash");
-          display.textContent = credit ? "CREDIT 1 · SELECT" : "INSERT COIN";
+          if (!busy) display.textContent = idle();
         }, 1600);
       }
     };
@@ -169,11 +172,15 @@ const ITEMS = [
       coinBtn.classList.add("is-dropping");
       sound("coin");
       credit = 1;
-      window.setTimeout(() => say("CREDIT 1 · SELECT"), reduce ? 0 : 350);
+      sayLater(reduce ? 0 : 350);
     });
 
     function vend(code: string) {
       if (busy) return;
+      if (pending) {
+        sound("error");
+        return say("TAKE YOUR ITEM FIRST", true);
+      }
       const item = root!.querySelector<HTMLButtonElement>(`.vm-item[data-code="${code}"]`);
       if (!item) return;
       if (!credit) {
@@ -214,7 +221,7 @@ const ITEMS = [
       // restock after a moment so the machine is never empty
       window.setTimeout(() => slot.classList.remove("is-vending", "is-dropped"), 900);
       say("THANK YOU");
-      window.setTimeout(() => say("INSERT COIN"), 1800);
+      sayLater(1800);
 
       const name = item.dataset.name || "";
       const subject = `Vending machine order: ${name}`;
@@ -234,19 +241,17 @@ const ITEMS = [
           copy.textContent = "Couldn't copy";
         }
       };
-      order.hidden = false;
+      order.showModal();
       order.querySelector<HTMLElement>(".vm-order__send")!.focus();
       printReceipt("Hire-o-matic", [[`1x ${name}`, "1 COIN"]], "Yuri will be in touch");
     });
 
-    const close = () => (order.hidden = true);
-    order.querySelector(".vm-order__close")!.addEventListener("click", close);
+    // native modal dialog: keeps focus inside and closes on Escape
+    order.querySelector(".vm-order__close")!.addEventListener("click", () => order.close());
     order.addEventListener("click", (e) => {
-      if (e.target === order) close();
+      if (e.target === order) order.close();
     });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !order.hidden) close();
-    });
+    order.addEventListener("close", () => coinBtn.focus());
   }
   document.addEventListener("astro:page-load", initVending);
   initVending();
@@ -574,21 +579,21 @@ const ITEMS = [
 
   /* ---- order card ---- */
   .vm-order {
-    position: fixed;
-    inset: 0;
-    z-index: 95;
-    display: grid;
-    place-items: center;
-    padding: 20px;
+    width: min(560px, calc(100vw - 32px));
+    max-width: none;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    overflow: visible;
+  }
+  .vm-order::backdrop {
     background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(3px);
   }
-  .vm-order[hidden] {
-    display: none;
-  }
   .vm-order__card {
     position: relative;
-    width: min(520px, 100%);
+    width: 100%;
     max-height: 90vh;
     overflow: auto;
     display: grid;

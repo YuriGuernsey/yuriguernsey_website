@@ -3,7 +3,7 @@
 // Inline so it covers the page before anything else paints. Any key or click skips it.
 ---
 
-<div class="yg-boot" hidden aria-hidden="true">
+<div class="yg-boot" hidden role="dialog" aria-modal="true" aria-label="Starting YURI-OS">
   <div class="yg-boot__screen">
     <div class="yg-boot__top">
       <span>YURI-OS BIOS v26.11</span>
@@ -11,7 +11,7 @@
     </div>
     <pre class="yg-boot__log"></pre>
     <div class="yg-boot__bar"><span></span></div>
-    <p class="yg-boot__skip">Press any key to skip</p>
+    <button type="button" class="yg-boot__skip">Press any key to skip</button>
   </div>
 </div>
 
@@ -31,6 +31,7 @@
     ];
     var timers = [];
     var running = false;
+    var returnTo = null;
 
     function finish() {
       if (!running) return;
@@ -41,6 +42,9 @@
         el.hidden = true;
         el.classList.remove("is-done");
         document.documentElement.classList.remove("yg-booting");
+        // hand focus back to something visible (the Settings button if the opener got hidden)
+        var target = returnTo && returnTo.offsetParent !== null ? returnTo : document.querySelector(".yg-fab");
+        if (target && target !== document.body && target.focus) target.focus({ preventScroll: true });
       }, 380);
       window.removeEventListener("keydown", finish);
       el.removeEventListener("pointerdown", finish);
@@ -51,8 +55,10 @@
       var bar = el.querySelector(".yg-boot__bar span");
       log.textContent = "";
       bar.style.width = "0%";
+      returnTo = document.activeElement;
       el.hidden = false;
       running = true;
+      el.querySelector(".yg-boot__skip").focus({ preventScroll: true });
       document.documentElement.classList.add("yg-booting");
       var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       var step = reduce ? 40 : 190;
@@ -148,7 +154,13 @@
     transition: width 160ms linear;
   }
   .yg-boot__skip {
+    display: block;
     margin: 14px 0 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
     color: rgba(200, 255, 212, 0.5);
     font-size: 0.78rem;
     animation: yg-blink 1s steps(2) infinite;

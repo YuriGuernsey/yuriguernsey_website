@@ -64,6 +64,12 @@ import { SKILLS } from "./skills";
       }
     };
 
+    const stop = () => {
+      window.clearInterval(marquee);
+      document.removeEventListener("astro:before-swap", stop);
+    };
+    document.addEventListener("astro:before-swap", stop);
+
     parts.forEach((p) => {
       p.addEventListener("pointerenter", () => show(p));
       p.addEventListener("focus", () => show(p));
@@ -333,6 +339,9 @@ import { SKILLS } from "./skills";
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .bb-lcd__screen .bb-lcd__l2 {
+      white-space: normal;
+    }
     .bb-part {
       transform: none;
       opacity: 1;

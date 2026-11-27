@@ -15,18 +15,6 @@ export function initScope(root: HTMLElement) {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   let on = read<boolean>("yg.scope", true);
-  const setOn = (v: boolean) => {
-    on = v;
-    wrap.hidden = !v;
-    if (v) kick();
-  };
-  if (toggle) {
-    toggle.checked = on;
-    toggle.addEventListener("change", () => {
-      write("yg.scope", toggle.checked);
-      setOn(toggle.checked);
-    });
-  }
 
   let W = 0;
   let H = 0;
@@ -103,8 +91,21 @@ export function initScope(root: HTMLElement) {
     if (!raf) raf = requestAnimationFrame(draw);
   }
 
+  // reveal first, then measure: a hidden wrapper reports zero size
+  const setOn = (v: boolean) => {
+    on = v;
+    wrap.hidden = !v;
+    if (v) resize();
+  };
+  if (toggle) {
+    toggle.checked = on;
+    toggle.addEventListener("change", () => {
+      write("yg.scope", toggle.checked);
+      setOn(toggle.checked);
+    });
+  }
+
   window.addEventListener("scroll", kick, { passive: true });
   window.addEventListener("resize", resize);
   setOn(on);
-  resize();
 }

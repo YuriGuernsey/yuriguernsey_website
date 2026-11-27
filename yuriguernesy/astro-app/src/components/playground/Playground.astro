@@ -82,7 +82,7 @@ const solderCursor = `url("data:image/svg+xml,${encodeURIComponent(
       () =>
         root.querySelector(".yg-sheet__reboot")?.addEventListener("click", () => {
           const boot = (window as unknown as { __ygBoot?: () => void }).__ygBoot;
-          root.querySelector<HTMLElement>(".yg-sheet")!.hidden = true;
+          root.querySelector<HTMLButtonElement>(".yg-sheet__close")?.click();
           boot?.();
         }),
     ];
@@ -644,6 +644,20 @@ const solderCursor = `url("data:image/svg+xml,${encodeURIComponent(
     margin: 0;
     font: 600 11px/1.45 ui-monospace, Menlo, Consolas, monospace;
     white-space: pre;
+  }
+  .yg-receipt__tear {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 4px 0;
+    border: 1px dashed #9a9a9a;
+    border-radius: 4px;
+    background: none;
+    color: #555;
+    font: 600 10px/1 ui-monospace, Menlo, monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
   }
   .yg-receipt.is-torn {
     animation: yg-tear 520ms ease-in forwards;

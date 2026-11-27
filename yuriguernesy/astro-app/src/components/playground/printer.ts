@@ -80,10 +80,16 @@ function printNext() {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const paper = document.createElement("div");
   paper.className = "yg-receipt yg-noinvert";
-  paper.setAttribute("role", "status");
   paper.title = "Click to tear off";
   const pre = document.createElement("pre");
+  pre.setAttribute("role", "status");
   paper.appendChild(pre);
+  const tearBtn = document.createElement("button");
+  tearBtn.type = "button";
+  tearBtn.className = "yg-receipt__tear";
+  tearBtn.textContent = "Tear off";
+  tearBtn.setAttribute("aria-label", "Tear off receipt");
+  paper.appendChild(tearBtn);
   document.body.appendChild(paper);
   document.querySelector(".yg-fab")?.classList.add("is-printing");
   rattle(lines.length);
@@ -100,6 +106,10 @@ function printNext() {
       }, 520);
     };
     paper.addEventListener("click", tear);
+    tearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      tear();
+    });
     window.setTimeout(tear, 5200);
   };
 

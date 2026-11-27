@@ -98,9 +98,11 @@ const LABELS = ["#ffe600", "#ff4d2e", "#22c55e", "#0ea5e9", "#a855f7", "#f472b6"
     const eject = root.querySelector<HTMLButtonElement>(".cx-eject")!;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let current: HTMLButtonElement | null = null;
+    let bootTimer = 0;
 
     function ejectCart() {
       if (!current) return;
+      window.clearTimeout(bootTimer);
       current.classList.remove("is-out");
       current = null;
       slot.classList.remove("is-loaded");
@@ -114,6 +116,7 @@ const LABELS = ["#ffe600", "#ff4d2e", "#22c55e", "#0ea5e9", "#a855f7", "#f472b6"
     function insert(cart: HTMLButtonElement) {
       if (current === cart) return;
       if (current) ejectCart();
+      window.clearTimeout(bootTimer);
       current = cart;
       cart.classList.add("is-out");
       slot.style.setProperty("--label", cart.style.getPropertyValue("--label"));
@@ -141,7 +144,7 @@ const LABELS = ["#ffe600", "#ff4d2e", "#22c55e", "#0ea5e9", "#a855f7", "#f472b6"
       idle.hidden = true;
       root.classList.remove("is-on");
       screen.classList.remove("is-booting");
-      window.setTimeout(
+      bootTimer = window.setTimeout(
         () => {
           root.classList.add("is-on");
           screen.classList.add("is-booting");
@@ -155,6 +158,17 @@ const LABELS = ["#ffe600", "#ff4d2e", "#22c55e", "#0ea5e9", "#a855f7", "#f472b6"
     eject.addEventListener("click", ejectCart);
 
     root.querySelectorAll<HTMLButtonElement>(".cx-cart").forEach((cart) => {
+      // click covers mouse, touch, keyboard and assistive tech; drags suppress the click that follows
+      let suppressClick = false;
+      cart.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (suppressClick) {
+          suppressClick = false;
+          return;
+        }
+        insert(cart);
+      });
+
       cart.addEventListener("pointerdown", (e) => {
         if (e.button > 0) return;
         const startX = e.clientX;
@@ -177,31 +191,25 @@ const LABELS = ["#ffe600", "#ff4d2e", "#22c55e", "#0ea5e9", "#a855f7", "#f472b6"
           const s = slot.getBoundingClientRect();
           slot.classList.toggle("is-target", ev.clientX > s.left - 40 && ev.clientX < s.right + 40 && ev.clientY > s.top - 80 && ev.clientY < s.bottom + 40);
         };
-        const up = () => {
+        const finish = (commit: boolean) => {
           window.removeEventListener("pointermove", move);
-          window.removeEventListener("pointerup", up);
-          window.removeEventListener("pointercancel", up);
+          window.removeEventListener("pointerup", onUp);
+          window.removeEventListener("pointercancel", onCancel);
           cart.classList.remove("is-dragging");
           const hit = slot.classList.contains("is-target");
           slot.classList.remove("is-target");
-          if (ghost) {
-            ghost.remove();
-            if (hit) insert(cart);
-          } else {
-            insert(cart);
-          }
+          if (!ghost) return; // a plain tap: the click handler inserts it
+          ghost.remove();
+          suppressClick = true;
+          window.setTimeout(() => (suppressClick = false), 0);
+          if (commit && hit) insert(cart);
         };
+        const onUp = () => finish(true);
+        const onCancel = () => finish(false);
         window.addEventListener("pointermove", move, { passive: false });
-        window.addEventListener("pointerup", up);
-        window.addEventListener("pointercancel", up);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("pointercancel", onCancel);
       });
-      cart.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          insert(cart);
-        }
-      });
-      cart.addEventListener("click", (e) => e.preventDefault());
     });
   }
   document.addEventListener("astro:page-load", initCartridges);
