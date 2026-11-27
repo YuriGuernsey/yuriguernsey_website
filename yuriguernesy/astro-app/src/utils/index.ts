@@ -53,7 +53,7 @@ export function normaliseHref(href?: string) {
   const value = href?.trim();
   if (!value) return "";
   if (/^(https?:|mailto:|tel:|#|\/|\.\/|\.\.\/)/i.test(value)) return value;
-  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/.*)?$/i.test(value)) return `https://${value}`;
+  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+([/?#].*)?$/i.test(value)) return `https://${value}`;
   return value;
 }
 
