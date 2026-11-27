@@ -17,7 +17,7 @@ const {
   title = settings?.defaultTitle?.trim() || "Portfolio 2026",
   description =
     settings?.defaultDescription?.trim() ||
-    "Yuri Alves is a Guernsey-based builder creating practical software, automation systems, and experimental hardware.",
+    "Yuri Murray-Alves is a Guernsey-based full-stack and embedded engineer, and Director of Legocia Ltd, building software, AI and hardware products.",
   image,
   type = "website",
   noIndex = false,
@@ -32,7 +32,7 @@ const twitterHandle = settings?.twitterHandle?.trim();
 const defaultSocialImage = settings?.defaultOgImage
   ? urlFor(settings.defaultOgImage).width(1200).height(630).fit("crop").url()
   : "";
-const socialImage = image?.trim() || defaultSocialImage;
+const socialImage = image?.trim() || defaultSocialImage || "/og-default.png";
 const socialImageUrl = socialImage
   ? socialImage.startsWith("http")
     ? socialImage
@@ -41,6 +41,18 @@ const socialImageUrl = socialImage
 const faviconUrl = settings?.faviconUrl?.trim() || "/favicon.svg";
 const appleTouchIconUrl = settings?.appleTouchIconUrl?.trim();
 const twitterCard = socialImageUrl ? "summary_large_image" : "summary";
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Yuri Murray-Alves",
+  alternateName: "Yuri Guernsey",
+  url: siteUrl,
+  jobTitle: "Full-Stack & Embedded Engineer",
+  homeLocation: { "@type": "Place", name: "Guernsey" },
+  worksFor: { "@type": "Organization", name: "Legocia Ltd", url: "https://legocia.com" },
+  sameAs: ["https://www.linkedin.com/in/yuriguernsey/", "https://github.com/YuriGuernsey"],
+};
 
 function getFileType(url: string) {
   const extension = url.split("?")[0]?.split(".")?.pop()?.toLowerCase();
@@ -89,6 +101,7 @@ const faviconType = getFileType(faviconUrl);
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
 
     <title>{pageTitle}</title>
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
 
     <ViewTransitions />
 
