@@ -2,7 +2,7 @@
 import { PortableText } from "astro-portabletext";
 import Layout from "../layouts/Layout.astro";
 import { urlforFile } from "../utils/image";
-import { formatRange, normaliseTag, toPlainText } from "../utils";
+import { formatRange, isExternalHref, normaliseHref, normaliseTag, toPlainText } from "../utils";
 import { getBlogPosts, getExperience, getHomepage, getProjects } from "../utils/sanity";
 import type { ActionLink, SectionIntro } from "../utils/sanity";
 
@@ -20,14 +20,14 @@ const brandAccent = home?.brandAccent?.trim() || "Guernsey";
 const brandMeta = home?.brandMeta?.trim() || "Portfolio / 2026";
 
 const heroEyebrow = home?.heroEyebrow?.trim() || "Guernsey based / working worldwide";
-const heroTitle = home?.heroTitle?.trim() || "I build real systems in days, not months.";
+const heroTitle = home?.heroTitle?.trim() || "I build software, hardware and the products in between.";
 const heroSummary =
   home?.herosubheading?.trim() ||
-  "Mobile apps, automation systems, AI workflows, and experiments that actually ship. Based in Guernsey. Built for real problems, not pitch decks.";
-const heroCurrentTitle = home?.heroSubtitle?.trim() || "Founder / Product builder";
+  "Full-stack and embedded engineer. Director of Legocia Ltd. Web apps, APIs, mobile, AI and automation, plus hardware prototypes that leave the bench.";
+const heroCurrentTitle = home?.heroSubtitle?.trim() || "Engineer / Director, Legocia";
 const heroCurrentDescription =
   home?.heroparagraph?.trim() ||
-  "Legocia, Aevea, and a rotating backlog of useful experiments. Shipping across software, automation, and hardware.";
+  "Full-stack developer at Bugbird by day. Running Legocia Ltd, a software, AI and embedded engineering company, the rest of the time.";
 const heroBackgroundVideoUrl = home?.heroBackgroundVideoUrl?.trim() || "";
 const heroOverlayColor = home?.heroOverlayColor?.trim() || "#000000";
 const heroOverlayOpacity = Number.isFinite(home?.heroOverlayOpacity)
@@ -48,7 +48,7 @@ function withDefaultSection(section: SectionIntro | undefined, fallback: Require
 function withDefaultAction(action: ActionLink | undefined, fallback: Required<ActionLink>) {
   return {
     label: action?.label?.trim() || fallback.label,
-    href: action?.href?.trim() || fallback.href,
+    href: normaliseHref(action?.href) || fallback.href,
     variant: action?.variant || fallback.variant,
   };
 }
@@ -78,10 +78,10 @@ const heroSecondaryAction = home?.heroSecondaryAction?.href
       });
 
 const projectsSection = withDefaultSection(home?.projectsSection, {
-  overline: "Current bets",
+  overline: "Projects",
   title: "Featured projects",
   description:
-    "Three active directions: a privacy-first wearable, an automation-first agency model, and a stream of practical software experiments.",
+    "Products and builds I'm working on right now.",
 });
 
 const workSection = withDefaultSection(home?.workSection, {
@@ -103,9 +103,9 @@ const aboutSection = withDefaultSection(home?.aboutSection, {
 });
 
 const connectSection = withDefaultSection(home?.connectSection, {
-  overline: "Elsewhere",
-  title: "Let's connect",
-  description: "Got an idea? A project? A weird challenge? Use this section for contact points, profiles, and the next obvious click.",
+  overline: "Work with me",
+  title: "Got something to build?",
+  description: "Contract software, embedded or product work goes through Legocia. Roles, collaborations and weird challenges, email me directly.",
 });
 
 const connectPrimaryAction = withDefaultAction(home?.connectPrimaryAction, {
@@ -171,7 +171,7 @@ const featureCards = (home?.featuredProjectCards?.length
       title: card.title || card.posterLabel || "Feature",
       description: card.description || card.posterSummary || "",
       tags: (card.tags || []).map((tag) => normaliseTag(tag)),
-      href: card.href || "#projects",
+      href: normaliseHref(card.href) || "#projects",
     }))
   : [...projectDocCards, ...defaultFeatureCards]).slice(0, 3);
 
@@ -213,7 +213,7 @@ const noteCards = home?.noteCards?.length
       title: card.title || "Untitled note",
       description: card.description || "",
       linkLabel: card.linkLabel || "Read more",
-      href: card.href || "#notes",
+      href: normaliseHref(card.href) || "#notes",
     })).slice(0, 4)
   : featuredPosts.length
     ? featuredPosts.map((post) => ({
@@ -273,8 +273,8 @@ const defaultManualGroups = [
   {
     label: "Interesting bits",
     items: [
-      "Founder of Legocia, a privacy-first wearable memory product",
-      "Building an automation-heavy agency operating model",
+      "Director of Legocia Ltd, a software, AI and embedded engineering company",
+      "Building Glimber, MyBuffBuddy and other Legocia products",
       "Comfortable moving between product, code, systems, and hardware",
     ],
   },
@@ -294,7 +294,8 @@ const defaultConnectCards = [
   {
     label: "Profile",
     title: "LinkedIn",
-    description: "Add your LinkedIn URL in Studio",
+    description: "linkedin.com/in/yuriguernsey",
+    href: "https://www.linkedin.com/in/yuriguernsey/",
   },
   {
     label: "Asset",
@@ -315,7 +316,7 @@ const connectCards = (home?.connectCards?.length ? home.connectCards : defaultCo
     label: card.label || "Elsewhere",
     title: card.title || "Link",
     description: card.description || "",
-    href: card.href?.trim(),
+    href: normaliseHref(card.href),
   }));
 
 const lifeMissionText =
@@ -384,10 +385,10 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
           <p class="home-summary">{heroSummary}</p>
 
           <div class="home-actions">
-            <a class:list={["home-btn", heroPrimaryAction.variant === "primary" && "home-btn--primary"]} href={heroPrimaryAction.href}>
+            <a class:list={["home-btn", heroPrimaryAction.variant === "primary" && "home-btn--primary"]} href={heroPrimaryAction.href} {...(isExternalHref(heroPrimaryAction.href) ? { target: "_blank", rel: "noopener" } : {})}>
               {heroPrimaryAction.label}
             </a>
-            <a class:list={["home-btn", heroSecondaryAction.variant === "primary" && "home-btn--primary"]} href={heroSecondaryAction.href}>
+            <a class:list={["home-btn", heroSecondaryAction.variant === "primary" && "home-btn--primary"]} href={heroSecondaryAction.href} {...(isExternalHref(heroSecondaryAction.href) ? { target: "_blank", rel: "noopener" } : {})}>
               {heroSecondaryAction.label}
             </a>
           </div>
@@ -437,8 +438,8 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
 
       <div class="home-projects">
         {featureCards.map((card) => (
-          <a class="home-project-card reveal" href={card.href}>
-            <div class="home-project-poster" data-mark={card.posterLabel}>
+          <a class="home-project-card reveal" href={card.href} {...(isExternalHref(card.href) ? { target: "_blank", rel: "noopener" } : {})}>
+            <div class="home-project-poster" data-mark={card.posterLabel} aria-hidden="true">
               <div class="home-ribbon">
                 {(card.ribbonTags?.length ? card.ribbonTags : card.tags || ["Featured"]).slice(0, 3).map((tag) => (
                   <span>{tag}</span>
@@ -505,7 +506,7 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
 
       <div class="home-notes">
         {noteCards.map((card) => (
-          <a class="home-note-card reveal" href={card.href}>
+          <a class="home-note-card reveal" href={card.href} {...(isExternalHref(card.href) ? { target: "_blank", rel: "noopener" } : {})}>
             <span class="home-card-meta">{card.meta}</span>
             <h3>{card.title}</h3>
             <p>{card.description}</p>
@@ -579,10 +580,10 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
           <p>{connectSection.description}</p>
 
           <div class="home-actions">
-            <a class:list={["home-btn", connectPrimaryAction.variant === "primary" && "home-btn--primary"]} href={connectPrimaryAction.href}>
+            <a class:list={["home-btn", connectPrimaryAction.variant === "primary" && "home-btn--primary"]} href={connectPrimaryAction.href} {...(isExternalHref(connectPrimaryAction.href) ? { target: "_blank", rel: "noopener" } : {})}>
               {connectPrimaryAction.label}
             </a>
-            <a class:list={["home-btn", connectSecondaryAction.variant === "primary" && "home-btn--primary"]} href={connectSecondaryAction.href}>
+            <a class:list={["home-btn", connectSecondaryAction.variant === "primary" && "home-btn--primary"]} href={connectSecondaryAction.href} {...(isExternalHref(connectSecondaryAction.href) ? { target: "_blank", rel: "noopener" } : {})}>
               {connectSecondaryAction.label}
             </a>
           </div>
@@ -591,7 +592,7 @@ function getJobMeta(job: (typeof featuredJobs)[number]) {
         <div class="home-connect__cards">
           {connectCards.map((card) => (
             card.href ? (
-              <a class="home-connect-card reveal" href={card.href}>
+              <a class="home-connect-card reveal" href={card.href} {...(isExternalHref(card.href) ? { target: "_blank", rel: "noopener" } : {})}>
                 <span class="home-card-meta">{card.label}</span>
                 <h3>{card.title}</h3>
                 <p>{card.description}</p>
