@@ -19,34 +19,39 @@ const solderCursor = `url("data:image/svg+xml,${encodeURIComponent(
 <div class="yg-root" data-solder-cursor={solderCursor}>
   <div class="yg-toasts" aria-live="polite"></div>
 
-  <div class="yg-sheet" id="yg-sheet" hidden>
+  <div class="yg-sheet" id="yg-sheet" role="dialog" aria-label="Settings" hidden>
     <div class="yg-sheet__top">
-      <div>
-        <strong>Sticker sheet</strong>
-        <p>Drag one onto the page. Flick your own stickers off the page to remove them.</p>
-      </div>
-      <button type="button" class="yg-sheet__close" aria-label="Close sticker sheet">×</button>
+      <strong>Settings</strong>
+      <button type="button" class="yg-sheet__close" aria-label="Close settings">×</button>
+    </div>
+
+    <div class="yg-settings__lights"></div>
+
+    <div class="yg-sheet__toggles">
+      <label><input type="checkbox" data-toggle="stickers" checked /> Show stickers on page</label>
+      <label><input type="checkbox" data-toggle="buddy" /> BuffBuddy (pixel gym buddy)</label>
+      <label><input type="checkbox" data-toggle="solder" /> Soldering-iron cursor on hardware work</label>
+    </div>
+
+    <div class="yg-sheet__section">
+      <strong>Stickers</strong>
+      <p>Drag one onto the page. Flick your own stickers off the page to remove them.</p>
     </div>
     <div class="yg-sheet__grid"></div>
     <p class="yg-sheet__count"></p>
     <p class="yg-sheet__mode">Loading the board...</p>
-    <div class="yg-sheet__toggles">
-      <label><input type="checkbox" data-toggle="stickers" checked /> Show stickers on page</label>
-      <label><input type="checkbox" data-toggle="buddy" checked /> Show BuffBuddy</label>
-    </div>
   </div>
 
   <button type="button" class="yg-fab" aria-controls="yg-sheet" aria-expanded="false">
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"
-      ><path
-        d="M4 4h11l5 5v11H4z"
-        fill="none"
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"></circle>
+      <path
+        d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"
         stroke="currentColor"
         stroke-width="2"
-        stroke-linejoin="round"></path><path d="M15 4v5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"
-      ></path></svg
-    >
-    Stickers
+        stroke-linecap="round"></path>
+    </svg>
+    Settings
   </button>
 </div>
 
@@ -64,10 +69,10 @@ const solderCursor = `url("data:image/svg+xml,${encodeURIComponent(
     const steps: Array<() => void> = [
       initHeroBuild,
       initTraces,
-      initLightSwitch,
+      () => initLightSwitch(root),
       () => initStickerBoard(root),
       () => initBuddy(root),
-      initSolder,
+      () => initSolder(root),
       initEasterEggs,
       initPixelWall,
     ];
@@ -375,6 +380,46 @@ const solderCursor = `url("data:image/svg+xml,${encodeURIComponent(
     justify-content: space-between;
     gap: 12px;
   }
+  .yg-sheet__top {
+    align-items: center;
+  }
+  .yg-sheet__section {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .yg-sheet__section strong {
+    font-size: 0.86rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .yg-sheet__section p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.45;
+  }
+  .yg-settings__lights {
+    margin-top: 14px;
+  }
+  .yg-settings__lights .yg-switch {
+    width: 100%;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    text-align: left;
+  }
+  .yg-switch__hint {
+    margin-left: auto;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: none;
+    font-size: 0.8rem;
+  }
+  .yg-sheet__toggles label[hidden] {
+    display: none;
+  }
   .yg-sheet__top strong {
     font-size: 1.05rem;
     letter-spacing: -0.03em;
@@ -448,10 +493,8 @@ const solderCursor = `url("data:image/svg+xml,${encodeURIComponent(
   }
   .yg-sheet__toggles {
     display: grid;
-    gap: 6px;
+    gap: 8px;
     margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--line-soft);
     font-size: 0.86rem;
   }
   .yg-sheet__toggles label {

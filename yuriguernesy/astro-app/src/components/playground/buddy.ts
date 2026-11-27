@@ -69,7 +69,7 @@ export function initBuddy(root: HTMLElement) {
   const spriteEl = el.querySelector<HTMLElement>(".yg-buddy__sprite")!;
   const bubble = el.querySelector<HTMLElement>(".yg-buddy__bubble")!;
 
-  const enabled = read<boolean>("yg.buddy.visible", true);
+  const enabled = read<boolean>("yg.buddy.visible", false);
   toggle.checked = enabled;
   el.hidden = !enabled;
   toggle.addEventListener("change", () => {
